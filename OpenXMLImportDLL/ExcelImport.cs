@@ -901,27 +901,33 @@ namespace OpenXMLImportDLL
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)1U };
                 CellValue cellValue = new CellValue();
 
-                
+
 
                 if (Int32.TryParse(d.Data.ToString(), out number))
                 {
                     cell.DataType = new EnumValue<CellValues>(CellValues.Number); //Добавление числового поля
                     cellValue.Text = number.ToString();
+
+
                 }
 
                 else
                 {
-                    
-                    //if (Decimal.TryParse(d.Data.ToString(), out dec))
-                    //{
-                    //    cell.DataType = new EnumValue<CellValues>(CellValues.Number); //Добавление числового поля
-                    //    cellValue.Text = dec.ToString();
-                    //}
+                    NumberStyles style;
+                    CultureInfo culture;
+                    style = NumberStyles.Number | NumberStyles.AllowCurrencySymbol;
+                    culture = CultureInfo.CreateSpecificCulture("");
+                    if (Decimal.TryParse(d.Data.ToString(), style, culture, out dec))
+                    {
+                        cell.DataType = new EnumValue<CellValues>(CellValues.Number); //Добавление числового поля
+                        cellValue.Text = dec.ToString();
+                    }
+                    else
+                    {
+                        cell.DataType = new EnumValue<CellValues>(CellValues.String); //Добавление текстового поля
+                        cellValue.Text = d.Data.ToString();
 
-
-                    cell.DataType = new EnumValue<CellValues>(CellValues.String); //Добавление текстового поля
-                    cellValue.Text = d.Data.ToString();
-
+                    }
                 }
 
                 cell.Append(cellValue);

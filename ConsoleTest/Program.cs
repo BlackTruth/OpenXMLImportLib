@@ -72,20 +72,30 @@ namespace ConsoleApplication1
             //    }
             //}
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "1");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "2");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 3, "3.5");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 4, "4,4");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 5, "1,1111");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 6, "1.2");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 7, "1.2");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 8, "1/3");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 9, "1/4");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "1");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "1,1");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 3, "1,11");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 4, "1,111");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 5, "1,1111");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 6, "1.2");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 7, "1.2");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 8, "1/3");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 9, "1/4");
 
-                  OpenXMLImportDLL.ExcelImport.AddCellData(1, 4, "12");
 
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 6, "3");
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 7, "56363");
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 8, "51.0123");
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "510,123");
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 3, "51.23");
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 4, "5231,0123.010");
-  
-          
+
+
             OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
             OpenXMLImportDLL.ExcelImport.ClearArray();
-    
+
         }
     }
 
