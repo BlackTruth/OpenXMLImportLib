@@ -22,7 +22,7 @@ namespace ConsoleApplication1
         {
             
             Console.WriteLine("Enter PATH");
-            string path = Console.ReadLine();
+            string path = "D:/Test";
             AddDir(path);
          
             AddExcel(path);
@@ -72,18 +72,16 @@ namespace ConsoleApplication1
             //    }
             //}
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "1");
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "q");
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 3, "Q11");
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 4, "12");
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 5, "1|2");
+
+                  OpenXMLImportDLL.ExcelImport.AddCellData(1, 4, "12");
+
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 6, "3");
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 7, "56363");
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 8, "51,0123");
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 8, "51.0123");
             OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "510.123");
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "51?3");
             OpenXMLImportDLL.ExcelImport.AddCellData(2, 3, "51.23");
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 4, "5231,0123");
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 9, "QWdasd111");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 4, "5231.0123");
+  
           
             OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
             OpenXMLImportDLL.ExcelImport.ClearArray();

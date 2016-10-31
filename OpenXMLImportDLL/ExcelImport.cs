@@ -900,7 +900,7 @@ namespace OpenXMLImportDLL
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)1U };
                 CellValue cellValue = new CellValue();
 
-
+                
 
                 if (Int32.TryParse(d.Data.ToString(), out number))
                 {
@@ -962,9 +962,11 @@ namespace OpenXMLImportDLL
             return sheetData.Descendants<Row>().FirstOrDefault(p => p.RowIndex == rowIndex);
         }
 
-        public static void ClearArray()
+        [System.Reflection.Obfuscation(Feature = "DllExport")]
+        public static long ClearArray()
         {
             cellsData.Clear();
+            return 1;
         }
 
     }
