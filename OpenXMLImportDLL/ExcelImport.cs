@@ -889,6 +889,7 @@ namespace OpenXMLImportDLL
                 int j = (int)d.Column;
                 string CurrentDecimalSeparator = NumberFormatInfo.CurrentInfo.CurrencyDecimalSeparator;
                 int number;
+                decimal dec;
                 Row row = GetRow(sheetData, i);
                 bool rowExists = true;
                 if (row == null)
@@ -910,6 +911,14 @@ namespace OpenXMLImportDLL
 
                 else
                 {
+                    
+                    //if (Decimal.TryParse(d.Data.ToString(), out dec))
+                    //{
+                    //    cell.DataType = new EnumValue<CellValues>(CellValues.Number); //Добавление числового поля
+                    //    cellValue.Text = dec.ToString();
+                    //}
+
+
                     cell.DataType = new EnumValue<CellValues>(CellValues.String); //Добавление текстового поля
                     cellValue.Text = d.Data.ToString();
 

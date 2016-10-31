@@ -78,9 +78,9 @@ namespace ConsoleApplication1
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 6, "3");
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 7, "56363");
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 8, "51.0123");
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "510.123");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "510,123");
             OpenXMLImportDLL.ExcelImport.AddCellData(2, 3, "51.23");
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 4, "5231.0123");
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 4, "5231,0123.010");
   
           
             OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
