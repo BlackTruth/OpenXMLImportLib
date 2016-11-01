@@ -155,13 +155,17 @@ namespace OpenXMLImportDLL
             Sheet sheet1 = new Sheet() { Name = "Лист1", SheetId = (UInt32Value)1U, Id = "rId1" };
 
             sheets1.Append(sheet1);
-            CalculationProperties calculationProperties1 = new CalculationProperties() { CalculationId = (UInt32Value)152511U };
+           
+            CalculationProperties calculationProperties = new CalculationProperties() { CalculationId = (UInt32Value)152511U };
+            calculationProperties.ForceFullCalculation = true;
+            calculationProperties.FullCalculationOnLoad = true;
+
 
             workbook1.Append(fileVersion1);
             workbook1.Append(workbookProperties1);
             workbook1.Append(bookViews1);
             workbook1.Append(sheets1);
-            workbook1.Append(calculationProperties1);
+            workbook1.Append(calculationProperties);
 
             workbookPart1.Workbook = workbook1;
         }
@@ -901,8 +905,16 @@ namespace OpenXMLImportDLL
 
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)1U };
                 CellValue cellValue = new CellValue();
+                CellFormula cellFormula = new CellFormula();
 
-                if (Int32.TryParse(d.Data.ToString(), out number))
+
+                if (d.Data.ToString().Substring(0,1)=="=")
+                {
+                    cell.DataType = new EnumValue<CellValues>(CellValues.String);
+                    cellFormula.Text = d.Data.ToString().Remove(0, 1);
+                }
+                    
+                else if (Int32.TryParse(d.Data.ToString(), out number))
                 {
                     cell.DataType = new EnumValue<CellValues>(CellValues.Number);
                     cellValue.Text = number.ToString();
@@ -921,15 +933,16 @@ namespace OpenXMLImportDLL
                 }
 
 
+                cell.Append(cellFormula);
                 cell.Append(cellValue);
                 row.Append(cell);
                 if (!rowExists) { sheetData.Append(row); }
             }
 
-            SheetViews sheetViews1 = new SheetViews();
-            sheetViews1.Append(new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U });
+            SheetViews sheetViews = new SheetViews();
+            sheetViews.Append(new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U });
             worksheet.Append(new SheetDimension() { Reference = "A1" });
-            worksheet.Append(sheetViews1);
+            worksheet.Append(sheetViews);
             worksheet.Append(new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D });
             worksheet.Append(sheetData);
             worksheet.Append(new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D });
