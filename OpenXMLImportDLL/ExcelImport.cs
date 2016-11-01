@@ -887,10 +887,12 @@ namespace OpenXMLImportDLL
             {
                 int i = (int)d.Row;
                 int j = (int)d.Column;
-                string CurrentDecimalSeparator = NumberFormatInfo.CurrentInfo.CurrencyDecimalSeparator;
-                int number;
                 Row row = GetRow(sheetData, i);
+                string NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
+                int number;
+                decimal dec;
                 bool rowExists = true;
+
                 if (row == null)
                 {
                     row = new Row() { RowIndex = ((UInt32Value)(UInt32)i), Spans = new ListValue<StringValue>() { InnerText = "1:3" }, DyDescent = 0.25D };
@@ -900,30 +902,33 @@ namespace OpenXMLImportDLL
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)1U };
                 CellValue cellValue = new CellValue();
 
-                
-
                 if (Int32.TryParse(d.Data.ToString(), out number))
                 {
                     cell.DataType = new EnumValue<CellValues>(CellValues.Number); //Добавление числового поля
                     cellValue.Text = number.ToString();
                 }
 
+                else if (Decimal.TryParse(d.Data.ToString(), out dec))
+                {
+                    string correctString = d.Data.ToString().Replace(NumberDecimalSeparator, ".");
+                    cell.DataType = new EnumValue<CellValues>(CellValues.Number);
+                    cellValue.Text = correctString;
+                }
                 else
                 {
                     cell.DataType = new EnumValue<CellValues>(CellValues.String); //Добавление текстового поля
                     cellValue.Text = d.Data.ToString();
-
                 }
+
 
                 cell.Append(cellValue);
                 row.Append(cell);
                 if (!rowExists) { sheetData.Append(row); }
             }
 
-
             SheetViews sheetViews1 = new SheetViews();
             sheetViews1.Append(new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U });
-            worksheet.Append(new SheetDimension() { Reference = "A5" });
+            worksheet.Append(new SheetDimension() { Reference = "A1" });
             worksheet.Append(sheetViews1);
             worksheet.Append(new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D });
             worksheet.Append(sheetData);
@@ -968,6 +973,8 @@ namespace OpenXMLImportDLL
             cellsData.Clear();
             return 1;
         }
+
+
 
     }
 
