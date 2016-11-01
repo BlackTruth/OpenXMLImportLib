@@ -17,23 +17,17 @@ namespace ConsoleApplication1
 {
     class Program
     {
-        
+
         static void Main(string[] args)
         {
-            
             Console.WriteLine("Enter PATH");
             string path = "D:/Test";
             AddDir(path);
-         
             AddExcel(path);
-            
-            
-
-
         }
         static string AddDir(string path)
         {
-           
+
             try
             {
                 // Determine whether the directory exists.
@@ -59,26 +53,20 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
-
-            
-
-
             //for (int i = 1; i < 8; i++)
             //{
             //    for (int j = 1; j < 8; j++)
             //    {
             //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, "QWdasd111");
-                    
+
             //    }
             //}
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "3,141");
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "3.141");
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 3, "3/141");
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 4, "1");
-
             OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
             OpenXMLImportDLL.ExcelImport.ClearArray();
-    
         }
     }
 

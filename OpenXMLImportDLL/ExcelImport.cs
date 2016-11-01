@@ -904,11 +904,11 @@ namespace OpenXMLImportDLL
 
                 if (Int32.TryParse(d.Data.ToString(), out number))
                 {
-                    cell.DataType = new EnumValue<CellValues>(CellValues.Number); //Добавление числового поля
+                    cell.DataType = new EnumValue<CellValues>(CellValues.Number);
                     cellValue.Text = number.ToString();
                 }
 
-                else if (Decimal.TryParse(d.Data.ToString(), out dec))
+                else if (Decimal.TryParse(d.Data.ToString(), NumberStyles.Number, CultureInfo.InstalledUICulture, out dec))
                 {
                     string correctString = d.Data.ToString().Replace(NumberDecimalSeparator, ".");
                     cell.DataType = new EnumValue<CellValues>(CellValues.Number);
@@ -916,7 +916,7 @@ namespace OpenXMLImportDLL
                 }
                 else
                 {
-                    cell.DataType = new EnumValue<CellValues>(CellValues.String); //Добавление текстового поля
+                    cell.DataType = new EnumValue<CellValues>(CellValues.String);
                     cellValue.Text = d.Data.ToString();
                 }
 
@@ -948,10 +948,10 @@ namespace OpenXMLImportDLL
 
         private static void SetPackageProperties(OpenXmlPackage document)
         {
-            document.PackageProperties.Creator = "";
-            document.PackageProperties.Created = System.Xml.XmlConvert.ToDateTime("2006-09-16T00:00:00Z", System.Xml.XmlDateTimeSerializationMode.RoundtripKind);
-            document.PackageProperties.Modified = System.Xml.XmlConvert.ToDateTime("2016-10-24T07:34:02Z", System.Xml.XmlDateTimeSerializationMode.RoundtripKind);
-            document.PackageProperties.LastModifiedBy = "";
+            document.PackageProperties.Description = "Created using OpenXML SDK and .NET 3.5";
+            document.PackageProperties.Version = "1.0.0.1";
+            document.PackageProperties.Creator = "ORC";
+            document.PackageProperties.Created = System.Xml.XmlConvert.ToDateTime(DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"), System.Xml.XmlDateTimeSerializationMode.RoundtripKind);
         }
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
@@ -973,6 +973,7 @@ namespace OpenXMLImportDLL
             cellsData.Clear();
             return 1;
         }
+
 
 
 
