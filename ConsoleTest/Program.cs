@@ -57,18 +57,18 @@ namespace ConsoleApplication1
             //{
             //    for (int j = 1; j < 8; j++)
             //    {
-            //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, (i + j).ToString());
+            //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, (i + j).ToString(), 5);
 
             //    }
             //}
-            //OpenXMLImportDLL.ExcelImport.AddCellData(8, 1, "=A1+A2+A3+A4+A5+A6+A7");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(8, 2, "=B1+B2+B3+B4+B5+B6+B7");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(8, 3, "=C1+C2+C3+C4+C5+C6+C7");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(8, 4, "=D1+D2+D3+D4+D5+D6+D7");
+            OpenXMLImportDLL.ExcelImport.AddCellData(8, 1, "=A1+A2+A3+A4+A5+A6+A7",1);
+            OpenXMLImportDLL.ExcelImport.AddCellData(8, 2, "=B1+B2+B3+B4+B5+B6+B7",2);
+            OpenXMLImportDLL.ExcelImport.AddCellData(8, 3, "=C1+C2+C3+C4+C5+C6+C7",3);
+            OpenXMLImportDLL.ExcelImport.AddCellData(8, 4, "=D1+D2+D3+D4+D5+D6+D7",4);
 
-            //OpenXMLImportDLL.ExcelImport.AddCellData(8, 5, "=E1+E2+E3+E4+E5+E6+E7");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(8, 6, "=F1+F2+F3+F4+F5+F6+F7");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(8, 7, "=G1+G2+G3+G4+G5+G6+G7");
+            OpenXMLImportDLL.ExcelImport.AddCellData(8, 5, "=E1+E2+E3+E4+E5+E6+E7",5);
+            OpenXMLImportDLL.ExcelImport.AddCellData(8, 6, "=F1+F2+F3+F4+F5+F6+F7",6);
+            OpenXMLImportDLL.ExcelImport.AddCellData(8, 7, "=G1+G2+G3+G4+G5+G6+G7",1);
             //OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "2");
             //OpenXMLImportDLL.ExcelImport.AddCellData(1, 3, "3");
             //OpenXMLImportDLL.ExcelImport.AddCellData(1, 4, "4");
@@ -81,7 +81,7 @@ namespace ConsoleApplication1
             //OpenXMLImportDLL.ExcelImport.AddCellData(3, 3, "=C1+C2");
             //OpenXMLImportDLL.ExcelImport.AddCellData(3, 4, "=D1+D2");
 
-            OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx", 1);
+            OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
             OpenXMLImportDLL.ExcelImport.ClearArray();
         }
     }
