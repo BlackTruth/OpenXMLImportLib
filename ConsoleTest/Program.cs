@@ -1,6 +1,7 @@
 ﻿using OpenXMLImportDLL;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 /*using System;
 using DocumentFormat.OpenXml.Packaging;
@@ -21,7 +22,7 @@ namespace ConsoleApplication1
         static void Main(string[] args)
         {
             Console.WriteLine("Enter PATH");
-            string path = "D:/hTestFormula";
+            string path = "E:/hTestFormula";
             AddDir(path);
             AddExcel(path);
         }
@@ -53,25 +54,15 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
-            
 
-                //for (int i = 2; i < 8; i++)
-                //{
-                //    for (int j = 1; j < 8; j++)
-                //    {
-                //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i.ToString() + j.ToString(), 6);
-
-                //    }
-                //}
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "1", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 3, "1", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 4, "1", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 5, "1", 6);
+            string input = "AFASDVZXC102301230";
+            string output = Regex.Replace(input, @"[A-Z]", string.Empty);
 
 
-                OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest2.xlsx");
-                OpenXMLImportDLL.ExcelImport.ClearArray();
-          
+
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 3, output, 6);
+            OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest2.xlsx");
+            OpenXMLImportDLL.ExcelImport.ClearArray();
         }
     }
 

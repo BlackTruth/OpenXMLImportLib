@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using A = DocumentFormat.OpenXml.Drawing;
 using Ap = DocumentFormat.OpenXml.ExtendedProperties;
 using Vt = DocumentFormat.OpenXml.VariantTypes;
@@ -37,21 +38,40 @@ namespace OpenXMLImportDLL
             return columnName;
         }
 
-        public static int ExcelColumnNameToNumber(string columnName)
+        private static int GetExcelColumnNumber(string columnName)
         {
-            if (string.IsNullOrEmpty(columnName)) throw new ArgumentNullException("columnName");
 
-            columnName = columnName.ToUpperInvariant();
+
+            string output = regexReplace(columnName, 1);
+            if (string.IsNullOrEmpty(output)) throw new ArgumentNullException("columnName");
+
+            output = output.ToUpperInvariant();
 
             int sum = 0;
 
-            for (int i = 0; i < columnName.Length; i++)
+            for (int i = 0; i < output.Length; i++)
             {
                 sum *= 26;
-                sum += (columnName[i] - 'A' + 1);
+                sum += (output[i] - 'A' + 1);
             }
 
             return sum;
+        }
+
+        private static string regexReplace(string input, int sw)
+        {
+            //sw=1 remove numbers from string //sw=2 remove char from string
+            if (sw == 1)
+            {
+                string output = Regex.Replace(input, @"[\d-]", string.Empty);
+                return output;
+            }
+            if (sw == 2)
+            {
+                string output = Regex.Replace(input, @"[A-Z]", string.Empty);
+                return output;
+            }
+            return "error";
         }
 
         // Adds child parts and generates content of the specified part.
@@ -2203,13 +2223,15 @@ namespace OpenXMLImportDLL
                 int i = (int)d.Row;
                 int j = (int)d.Column;
                 int k = (int)d.BorderStyleId;
-                
+
                 int number;
                 decimal dec;
 
                 Row row = GetRow(sheetData, i);
-                
-                Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
+
+                //Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
+
+                Cell cell = InsertCellIntoRow(sheetData, j, i, k);
                 CellValue cellValue = new CellValue();
                 CellFormula cellFormula = new CellFormula();
 
@@ -2242,8 +2264,8 @@ namespace OpenXMLImportDLL
                     cell.Append(cellValue);
                 }
 
-                row.Append(cell);
-                               
+                //row.Append(cell);
+
             }
 
 
@@ -2315,7 +2337,7 @@ namespace OpenXMLImportDLL
         {
 
             cellsData.Add(new CellData(rowIndex, colIndex, data, borderStyleId));
-                        return 0;
+            return 0;
         }
         private static Row GetRow(SheetData sheetData, int rowIndex)
         {
@@ -2343,40 +2365,51 @@ namespace OpenXMLImportDLL
         {
             double? rowHeight;
             Row row = null;
-     
-                if (rowHeightArr.TryGetValue(i, out rowHeight))
-                {
-                    row = new Row()
-                    {
-                        RowIndex = ((UInt32Value)(UInt32)i),
-                        Height = rowHeight,
-                        CustomHeight = true,
-                        Spans = new ListValue<StringValue>() { InnerText = "1:3" },
-                        DyDescent = 0.25D
-                    };
-                }
-                else
-                {
-                    row = new Row()
-                    {
-                        RowIndex = ((UInt32Value)(UInt32)i),
-                        Spans = new ListValue<StringValue>() { InnerText = "1:3" },
-                        DyDescent = 0.25D
-                    };
 
-                }
-          
+            if (rowHeightArr.TryGetValue(i, out rowHeight))
+            {
+                row = new Row()
+                {
+                    RowIndex = ((UInt32Value)(UInt32)i),
+                    Height = rowHeight,
+                    CustomHeight = true,
+                    Spans = new ListValue<StringValue>() { InnerText = "1:3" },
+                    DyDescent = 0.25D
+                };
+            }
+            else
+            {
+                row = new Row()
+                {
+                    RowIndex = ((UInt32Value)(UInt32)i),
+                    Spans = new ListValue<StringValue>() { InnerText = "1:3" },
+                    DyDescent = 0.25D
+                };
+
+            }
+
             return row;
         }
 
-        //private static Cell InsertCellIntoRow(SheetData sheetData ,int colIndex, int rowIndex, int borderIndex)
-        //{
-        //    Cell newCell = null;
-        //    foreach (Cell current in sheetData.Elements<Cell>())
-        //    {
-        //        if (current.CellReference.ToString().Substring(0,1) >= GetExcelColumnName(colIndex))
-        //    }
-        //}
+        private static Cell InsertCellIntoRow(SheetData sheetData, int colIndex, int rowIndex, int borderIndex)
+        {
+            Cell newCell = null;
+            foreach (Cell current in sheetData.Elements<Cell>())
+            {
+                if (GetExcelColumnNumber(current.CellReference.ToString()) <= colIndex & Int32.Parse(regexReplace(current.CellReference.ToString(), 2)) == rowIndex)
+                {
+                    if (GetExcelColumnNumber(current.CellReference.ToString()) == colIndex)
+                        return current;
+                    
+                    newCell = new Cell() { CellReference = GetExcelColumnName(colIndex) + rowIndex, StyleIndex = (UInt32Value)(UInt32)borderIndex };
+                    sheetData.InsertBefore<Cell>(newCell, current);
+                    return newCell;
+                }
+            }
+            newCell = new Cell() { CellReference = GetExcelColumnName(colIndex) + rowIndex, StyleIndex = (UInt32Value)(UInt32)borderIndex };
+            sheetData.Append(newCell);
+            return newCell;
+        }
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static long ClearArray()
