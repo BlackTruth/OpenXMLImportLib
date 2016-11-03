@@ -53,31 +53,25 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
+            
 
-            for (int k = 1; k <2; k++)
-            {
-            for (int i = 1; i < 8; i++)
-            {
-                for (int j = 1; j < 80; j++)
-                {
-                    OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i.ToString() + j.ToString(), 6);
+                //for (int i = 2; i < 8; i++)
+                //{
+                //    for (int j = 1; j < 8; j++)
+                //    {
+                //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i.ToString() + j.ToString(), 6);
 
-                }
-            }
+                //    }
+                //}
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "1", 6);
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 3, "1", 6);
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 4, "1", 6);
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 5, "1", 6);
 
-            OpenXMLImportDLL.ExcelImport.AddCellData(8, 1, "=A1+A2+A3+A4+A5+A6+A7*A1", 1);
-            OpenXMLImportDLL.ExcelImport.AddCellData(8, 2, "=B1+B2+B3+B4+B5+B6+B7*A2", 2);
-            OpenXMLImportDLL.ExcelImport.AddCellData(8, 3, "=C1+C2+C3+C4+C5+C6+C7", 3);
-            OpenXMLImportDLL.ExcelImport.AddCellData(8, 4, "=D1+D2+D3+D4+D5+D6+D7", 4);
-            OpenXMLImportDLL.ExcelImport.AddCellData(8, 5, "=E1+E2+E3+E4+E5+E6+E7", 5);
-            OpenXMLImportDLL.ExcelImport.AddCellData(8, 6, "=F1+F2+F3+F4+F5+F6+F7", 6);
-     
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(1, 50);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 30);
 
-                OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
+                OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest2.xlsx");
                 OpenXMLImportDLL.ExcelImport.ClearArray();
-            }
+          
         }
     }
 

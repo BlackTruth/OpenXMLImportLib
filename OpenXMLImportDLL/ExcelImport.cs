@@ -37,6 +37,22 @@ namespace OpenXMLImportDLL
             return columnName;
         }
 
+        public static int ExcelColumnNameToNumber(string columnName)
+        {
+            if (string.IsNullOrEmpty(columnName)) throw new ArgumentNullException("columnName");
+
+            columnName = columnName.ToUpperInvariant();
+
+            int sum = 0;
+
+            for (int i = 0; i < columnName.Length; i++)
+            {
+                sum *= 26;
+                sum += (columnName[i] - 'A' + 1);
+            }
+
+            return sum;
+        }
 
         // Adds child parts and generates content of the specified part.
 
@@ -2179,6 +2195,58 @@ namespace OpenXMLImportDLL
             SheetFormatProperties sheetFormatProperties1 = new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D };
 
 
+
+            SheetData sheetData = new SheetData();
+
+            foreach (CellData d in cellsData)
+            {
+                int i = (int)d.Row;
+                int j = (int)d.Column;
+                int k = (int)d.BorderStyleId;
+                
+                int number;
+                decimal dec;
+
+                Row row = GetRow(sheetData, i);
+                
+                Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
+                CellValue cellValue = new CellValue();
+                CellFormula cellFormula = new CellFormula();
+
+                if (d.Data.ToString().Substring(0, 1) == "=")
+                {
+                    cell.DataType = new EnumValue<CellValues>(CellValues.String);
+                    cellFormula.Text = d.Data.ToString().Remove(0, 1);
+                    cell.Append(cellFormula);
+                }
+
+                else if (Int32.TryParse(d.Data.ToString(), out number))
+                {
+                    cell.DataType = new EnumValue<CellValues>(CellValues.Number);
+                    cellValue.Text = number.ToString();
+                    cell.Append(cellValue);
+                }
+
+                else if (Decimal.TryParse(d.Data.ToString(), NumberStyles.Number, CultureInfo.InstalledUICulture, out dec))
+                {
+                    string NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
+                    string correctString = d.Data.ToString().Replace(NumberDecimalSeparator, ".");
+                    cell.DataType = new EnumValue<CellValues>(CellValues.Number);
+                    cellValue.Text = correctString;
+                    cell.Append(cellValue);
+                }
+                else
+                {
+                    cell.DataType = new EnumValue<CellValues>(CellValues.String);
+                    cellValue.Text = d.Data.ToString();
+                    cell.Append(cellValue);
+                }
+
+                row.Append(cell);
+                               
+            }
+
+
             Columns columns = new Columns();
             foreach (ColumnWidth d in columnWidthArr)
             {
@@ -2193,80 +2261,7 @@ namespace OpenXMLImportDLL
                 };
                 columns.Append(column);
             }
-            SheetData sheetData = new SheetData();
 
-            foreach (CellData d in cellsData)
-            {
-                int i = (int)d.Row;
-                int j = (int)d.Column;
-                int k = (int)d.BorderStyleId;
-                double? rowHeight;
-                Row row = GetRow(sheetData, i);
-                string NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
-                int number;
-                decimal dec;
-                bool rowExists = true;
-
-                if (row == null)
-                {
-                    if (rowHeightArr.TryGetValue(i, out rowHeight))
-                    {
-                        row = new Row()
-                        {
-                            RowIndex = ((UInt32Value)(UInt32)i),
-                            Height = rowHeight,
-                            CustomHeight = true,
-                            Spans = new ListValue<StringValue>() { InnerText = "1:3" },
-                            DyDescent = 0.25D
-                        };
-                        rowExists = false;
-                        rowHeightArr.Remove(i);
-                    }
-                    else
-                    {
-                        row = new Row()
-                        {
-                            RowIndex = ((UInt32Value)(UInt32)i),
-                            Spans = new ListValue<StringValue>() { InnerText = "1:3" },
-                            DyDescent = 0.25D
-                        };
-                        rowExists = false;
-                    }
-                }
-
-                Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
-                CellValue cellValue = new CellValue();
-                CellFormula cellFormula = new CellFormula();
-
-                if (d.Data.ToString().Substring(0, 1) == "=")
-                {
-                    cell.DataType = new EnumValue<CellValues>(CellValues.String);
-                    cellFormula.Text = d.Data.ToString().Remove(0, 1);
-                }
-
-                else if (Int32.TryParse(d.Data.ToString(), out number))
-                {
-                    cell.DataType = new EnumValue<CellValues>(CellValues.Number);
-                    cellValue.Text = number.ToString();
-                }
-
-                else if (Decimal.TryParse(d.Data.ToString(), NumberStyles.Number, CultureInfo.InstalledUICulture, out dec))
-                {
-                    string correctString = d.Data.ToString().Replace(NumberDecimalSeparator, ".");
-                    cell.DataType = new EnumValue<CellValues>(CellValues.Number);
-                    cellValue.Text = correctString;
-                }
-                else
-                {
-                    cell.DataType = new EnumValue<CellValues>(CellValues.String);
-                    cellValue.Text = d.Data.ToString();
-                }
-
-                cell.Append(cellFormula);
-                cell.Append(cellValue);
-                row.Append(cell);
-                if (!rowExists) { sheetData.Append(row); }
-            }
 
             SheetViews sheetViews = new SheetViews();
             sheetViews.Append(new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U });
@@ -2279,96 +2274,7 @@ namespace OpenXMLImportDLL
             worksheetPart.Worksheet = worksheet;
             worksheet.Save();
 
-
-            //PageMargins pageMargins1 = new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D };
-
-            //worksheet1.Append(sheetDimension1);
-            //worksheet1.Append(sheetViews1);
-            //worksheet1.Append(sheetFormatProperties1);
-            //worksheet1.Append(columns);
-            //worksheet1.Append(sheetData);
-            //worksheet1.Append(pageMargins1);
-
-            //worksheetPart.Worksheet = worksheet1;
-            //worksheet1.Save();
         }
-
-
-
-
-
-        //    Worksheet worksheet = new Worksheet() { MCAttributes = new MarkupCompatibilityAttributes() { Ignorable = "x14ac" } };
-        //    worksheet.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
-        //    worksheet.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
-        //    worksheet.AddNamespaceDeclaration("x14ac", "http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac");
-
-
-        //    SheetData sheetData = new SheetData();
-        //    foreach (CellData d in cellsData)
-        //    {
-        //        int i = (int)d.Row;
-        //        int j = (int)d.Column;
-        //        int k = (int)d.BorderStyleId;
-        //        Row row = GetRow(sheetData, i);
-        //        string NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
-        //        int number;
-        //        decimal dec;
-        //        bool rowExists = true;
-
-
-        //        if (row == null)
-        //        {
-        //            row = new Row() { RowIndex = ((UInt32Value)(UInt32)i), Spans = new ListValue<StringValue>() { InnerText = "1:3" }, DyDescent = 0.25D };
-        //            rowExists = false;
-        //        }
-
-        //        Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
-        //        CellValue cellValue = new CellValue();
-        //        CellFormula cellFormula = new CellFormula();
-
-
-        //        if (d.Data.ToString().Substring(0, 1) == "=")
-        //        {
-        //            cell.DataType = new EnumValue<CellValues>(CellValues.String);
-        //            cellFormula.Text = d.Data.ToString().Remove(0, 1);
-        //        }
-
-        //        else if (Int32.TryParse(d.Data.ToString(), out number))
-        //        {
-        //            cell.DataType = new EnumValue<CellValues>(CellValues.Number);
-        //            cellValue.Text = number.ToString();
-        //        }
-
-        //        else if (Decimal.TryParse(d.Data.ToString(), NumberStyles.Number, CultureInfo.InstalledUICulture, out dec))
-        //        {
-        //            string correctString = d.Data.ToString().Replace(NumberDecimalSeparator, ".");
-        //            cell.DataType = new EnumValue<CellValues>(CellValues.Number);
-        //            cellValue.Text = correctString;
-        //        }
-        //        else
-        //        {
-        //            cell.DataType = new EnumValue<CellValues>(CellValues.String);
-        //            cellValue.Text = d.Data.ToString();
-        //        }
-
-
-        //        cell.Append(cellFormula);
-        //        cell.Append(cellValue);
-        //        row.Append(cell);
-        //        if (!rowExists) { sheetData.Append(row); }
-        //    }
-
-        //    SheetViews sheetViews = new SheetViews();
-        //    sheetViews.Append(new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U });
-        //    worksheet.Append(new SheetDimension() { Reference = "A1" });
-        //    worksheet.Append(sheetViews);
-        //    worksheet.Append(new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D });
-        //    worksheet.Append(sheetData);
-        //    worksheet.Append(new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D });
-
-        //    worksheetPart.Worksheet = worksheet;
-        //    worksheet.Save();
-        //}
 
         // Generates content of sharedStringTablePart1.
         private static void GenerateSharedStringTablePart1Content(SharedStringTablePart sharedStringTablePart1)
@@ -2409,13 +2315,68 @@ namespace OpenXMLImportDLL
         {
 
             cellsData.Add(new CellData(rowIndex, colIndex, data, borderStyleId));
-
-            return 0;
+                        return 0;
         }
         private static Row GetRow(SheetData sheetData, int rowIndex)
         {
-            return sheetData.Descendants<Row>().FirstOrDefault(p => p.RowIndex == rowIndex);
+            Row newRow = null;
+            foreach (Row current in sheetData.Elements<Row>())
+            {
+                if (current.RowIndex >= rowIndex)
+                {
+                    if (current.RowIndex == rowIndex)
+                        return current;
+                    //create your row here
+                    newRow = GetNewRow(rowIndex);
+                    sheetData.InsertBefore<Row>(newRow, current);
+                    return newRow;
+                }
+            }
+
+            //create your row here
+            newRow = GetNewRow(rowIndex);
+            sheetData.Append(newRow);
+            return newRow;
         }
+
+        private static Row GetNewRow(int i)
+        {
+            double? rowHeight;
+            Row row = null;
+     
+                if (rowHeightArr.TryGetValue(i, out rowHeight))
+                {
+                    row = new Row()
+                    {
+                        RowIndex = ((UInt32Value)(UInt32)i),
+                        Height = rowHeight,
+                        CustomHeight = true,
+                        Spans = new ListValue<StringValue>() { InnerText = "1:3" },
+                        DyDescent = 0.25D
+                    };
+                }
+                else
+                {
+                    row = new Row()
+                    {
+                        RowIndex = ((UInt32Value)(UInt32)i),
+                        Spans = new ListValue<StringValue>() { InnerText = "1:3" },
+                        DyDescent = 0.25D
+                    };
+
+                }
+          
+            return row;
+        }
+
+        //private static Cell InsertCellIntoRow(SheetData sheetData ,int colIndex, int rowIndex, int borderIndex)
+        //{
+        //    Cell newCell = null;
+        //    foreach (Cell current in sheetData.Elements<Cell>())
+        //    {
+        //        if (current.CellReference.ToString().Substring(0,1) >= GetExcelColumnName(colIndex))
+        //    }
+        //}
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static long ClearArray()
@@ -2430,29 +2391,6 @@ namespace OpenXMLImportDLL
 
 
     }
-    public class ColumnWidth
-    {
-        int columnIndex;
-        double columnWidth;
-
-        public ColumnWidth(int columnIndex, double columnWidth)
-        {
-            this.columnIndex = columnIndex;
-            this.columnWidth = columnWidth;
-        }
-        public int Column
-        {
-            get { return columnIndex; }
-            set { columnIndex = value; }
-        }
-        public double Width
-        {
-            get { return columnWidth; }
-            set { columnWidth = value; }
-        }
-
-    }
-
 }
 public class CellData
 {
@@ -2495,5 +2433,27 @@ public class CellData
     }
 
 
+
+}
+public class ColumnWidth
+{
+    int columnIndex;
+    double columnWidth;
+
+    public ColumnWidth(int columnIndex, double columnWidth)
+    {
+        this.columnIndex = columnIndex;
+        this.columnWidth = columnWidth;
+    }
+    public int Column
+    {
+        get { return columnIndex; }
+        set { columnIndex = value; }
+    }
+    public double Width
+    {
+        get { return columnWidth; }
+        set { columnWidth = value; }
+    }
 
 }
