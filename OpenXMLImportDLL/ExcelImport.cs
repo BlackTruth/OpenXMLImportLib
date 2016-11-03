@@ -2229,11 +2229,11 @@ namespace OpenXMLImportDLL
 
                 Row row = GetRow(sheetData, i);
 
-                //Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
+                Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
 
-                Cell cell = InsertCellIntoRow(sheetData, j, i, k);
                 CellValue cellValue = new CellValue();
                 CellFormula cellFormula = new CellFormula();
+
 
                 if (d.Data.ToString().Substring(0, 1) == "=")
                 {
@@ -2263,7 +2263,7 @@ namespace OpenXMLImportDLL
                     cellValue.Text = d.Data.ToString();
                     cell.Append(cellValue);
                 }
-
+                InsertCellIntoRow(sheetData, cell, row, j, i, k);
                 //row.Append(cell);
 
             }
@@ -2391,24 +2391,29 @@ namespace OpenXMLImportDLL
             return row;
         }
 
-        private static Cell InsertCellIntoRow(SheetData sheetData, int colIndex, int rowIndex, int borderIndex)
+        private static void InsertCellIntoRow(SheetData sheetData, Cell cell, Row row, int colIndex, int rowIndex, int borderIndex)
         {
-            Cell newCell = null;
             foreach (Cell current in sheetData.Elements<Cell>())
             {
-                if (GetExcelColumnNumber(current.CellReference.ToString()) <= colIndex & Int32.Parse(regexReplace(current.CellReference.ToString(), 2)) == rowIndex)
+
+                if (GetExcelColumnNumber(current.CellReference.ToString()) <= colIndex)// && Int32.Parse(regexReplace(current.CellReference.ToString(), 2)) == rowIndex)
                 {
                     if (GetExcelColumnNumber(current.CellReference.ToString()) == colIndex)
-                        return current;
-                    
-                    newCell = new Cell() { CellReference = GetExcelColumnName(colIndex) + rowIndex, StyleIndex = (UInt32Value)(UInt32)borderIndex };
-                    sheetData.InsertBefore<Cell>(newCell, current);
-                    return newCell;
+                    {
+                        row.Append(cell);
+                      //  row.InsertBefore<Cell>(cell, current);
+                        break;
+                    }
+                    row.Append(cell);
+                    //row.InsertBefore<Cell>(cell, current);
+                    break;
+
                 }
             }
-            newCell = new Cell() { CellReference = GetExcelColumnName(colIndex) + rowIndex, StyleIndex = (UInt32Value)(UInt32)borderIndex };
-            sheetData.Append(newCell);
-            return newCell;
+            
+          
+            //row.Append(cell);
+
         }
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]

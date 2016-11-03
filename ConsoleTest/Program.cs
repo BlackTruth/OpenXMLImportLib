@@ -54,13 +54,23 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
+            //for(int i = 6; i < 100; i++)
+            //{
+            //    for (int j=6; j<10; j++)
+            //    {
+            //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i+"|"+j, 6);
+            //    }
+            //}
 
-            string input = "AFASDVZXC102301230";
-            string output = Regex.Replace(input, @"[A-Z]", string.Empty);
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "2", 6);
+            OpenXMLImportDLL.ExcelImport.AddCellData(3, 3, "2", 6);
+            
+            OpenXMLImportDLL.ExcelImport.AddCellData(5, 5, "3", 6);
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "3", 6);
+            OpenXMLImportDLL.ExcelImport.AddCellData(4, 1, "3", 6);
 
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "2", 6);
 
-
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 3, output, 6);
             OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest2.xlsx");
             OpenXMLImportDLL.ExcelImport.ClearArray();
         }
