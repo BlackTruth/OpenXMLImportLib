@@ -21,6 +21,11 @@ namespace OpenXMLImportDLL
         static ArrayList cellsData = new ArrayList();
 
 
+        public static ExcelImport getInstance()
+        {
+            return new ExcelImport();
+        }
+
         //Convert Excel column number to Excel column name (1=A, 2=B)
         private static string GetExcelColumnName(int columnNumber)
         {
@@ -2223,17 +2228,12 @@ namespace OpenXMLImportDLL
                 int i = (int)d.Row;
                 int j = (int)d.Column;
                 int k = (int)d.BorderStyleId;
-
                 int number;
                 decimal dec;
-
                 Row row = GetRow(sheetData, i);
-
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
-
                 CellValue cellValue = new CellValue();
                 CellFormula cellFormula = new CellFormula();
-
 
                 if (d.Data.ToString().Substring(0, 1) == "=")
                 {
@@ -2241,14 +2241,12 @@ namespace OpenXMLImportDLL
                     cellFormula.Text = d.Data.ToString().Remove(0, 1);
                     cell.Append(cellFormula);
                 }
-
                 else if (Int32.TryParse(d.Data.ToString(), out number))
                 {
                     cell.DataType = new EnumValue<CellValues>(CellValues.Number);
                     cellValue.Text = number.ToString();
                     cell.Append(cellValue);
                 }
-
                 else if (Decimal.TryParse(d.Data.ToString(), NumberStyles.Number, CultureInfo.InstalledUICulture, out dec))
                 {
                     string NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
@@ -2263,8 +2261,8 @@ namespace OpenXMLImportDLL
                     cellValue.Text = d.Data.ToString();
                     cell.Append(cellValue);
                 }
-                InsertCellIntoRow(sheetData, cell, row, j, i, k);
-                //row.Append(cell);
+
+                InsertCellIntoRow(cell, row);
 
             }
 
@@ -2391,30 +2389,57 @@ namespace OpenXMLImportDLL
             return row;
         }
 
-        private static void InsertCellIntoRow(SheetData sheetData, Cell cell, Row row, int colIndex, int rowIndex, int borderIndex)
+        private static void InsertCellIntoRow(Cell cell, Row row)
         {
-            foreach (Cell current in sheetData.Elements<Cell>())
+
+            int cellColIndex = GetExcelColumnNumber(cell.CellReference.ToString());
+
+            foreach (Cell current in row.Elements<Cell>())
             {
-
-                if (GetExcelColumnNumber(current.CellReference.ToString()) <= colIndex)// && Int32.Parse(regexReplace(current.CellReference.ToString(), 2)) == rowIndex)
+                int comp = GetExcelColumnNumber(current.CellReference.ToString()) - cellColIndex;
+                if (comp >= 0)
                 {
-                    if (GetExcelColumnNumber(current.CellReference.ToString()) == colIndex)
+                    if (comp == 0)
                     {
-                        row.Append(cell);
-                      //  row.InsertBefore<Cell>(cell, current);
-                        break;
+                        row.InsertBefore<Cell>(cell, current);
+                        current.Remove();
+                        return;
                     }
-                    row.Append(cell);
-                    //row.InsertBefore<Cell>(cell, current);
-                    break;
-
+                    row.InsertBefore<Cell>(cell, current);
+                    return;
                 }
+
+
             }
-            
-          
-            //row.Append(cell);
+
+            row.Append(cell);
+            return;
 
         }
+
+
+        //foreach (Cell current in sheetData.Elements<Cell>())
+        //{
+
+        //    if (GetExcelColumnNumber(current.CellReference.ToString()) <= colIndex)// && Int32.Parse(regexReplace(current.CellReference.ToString(), 2)) == rowIndex)
+        //    {
+        //        if (GetExcelColumnNumber(current.CellReference.ToString()) == colIndex)
+        //        {
+        //            row.Append(cell);
+        //          //  row.InsertBefore<Cell>(cell, current);
+        //            break;
+        //        }
+        //        row.Append(cell);
+        //        //row.InsertBefore<Cell>(cell, current);
+        //        break;
+
+        //    }
+        //}
+
+        //Console.ReadKey();
+        //row.Append(cell);
+
+        //}
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static long ClearArray()

@@ -22,7 +22,7 @@ namespace ConsoleApplication1
         static void Main(string[] args)
         {
             Console.WriteLine("Enter PATH");
-            string path = "E:/hTestFormula";
+            string path = "D:/Test";
             AddDir(path);
             AddExcel(path);
         }
@@ -54,25 +54,24 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
-            //for(int i = 6; i < 100; i++)
+            OpenXMLImportDLL.ExcelImport.getInstance();
+
+            //for (int i = 1; i < 100; i++)
             //{
-            //    for (int j=6; j<10; j++)
+            //    for (int j = 1; j < 10; j++)
             //    {
-            //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i+"|"+j, 6);
+            //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i + "|" + j, 6);
             //    }
             //}
-
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "2", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(3, 3, "2", 6);
-            
-            OpenXMLImportDLL.ExcelImport.AddCellData(5, 5, "3", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "3", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(4, 1, "3", 6);
-
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "2", 6);
-
-            OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest2.xlsx");
-            OpenXMLImportDLL.ExcelImport.ClearArray();
+            //OpenXMLImportDLL.ExcelImport.AddColumnWidth(3, 100);
+            //OpenXMLImportDLL.ExcelImport.AddRowHeight(3, 200);
+            //OpenXMLImportDLL.ExcelImport.AddRowHeight(7, 200);
+            //OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "1", 6);
+            //OpenXMLImportDLL.ExcelImport.AddCellData(3, 4, "2", 6);
+            //OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "3", 6);
+            //OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "4", 6);
+            //OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest2.xlsx");
+            //OpenXMLImportDLL.ExcelImport.ClearArray();
         }
     }
 
