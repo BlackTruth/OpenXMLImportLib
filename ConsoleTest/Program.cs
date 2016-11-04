@@ -54,37 +54,50 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
-            ExcelImport obj = ExcelImport.getInstance();
+            //ExcelImport obj = ExcelImport.GetInstance();
            
-            for (int i = 1; i < 100; i++)
-            {
-                for (int j = 1; j < 10; j++)
-                {
-                    obj.AddCellData(i, j, i + "|" + j, 6);
-                }
-            }
-            obj.AddCellData(2, 2, "2", 2);
-            obj.AddColumnWidth(1, 100);
-            obj.AddRowHeight(1, 100);
-
-            obj.GenerateExcel(path + "/Newtest2.xlsx");
-            obj.ClearArray();
-            //for (int i = 1; i < 100; i++)
+            //for (int i = 1; i < 10000; i++)
             //{
             //    for (int j = 1; j < 10; j++)
             //    {
-            //        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i + "|" + j, 6);
+            //        obj.AddCellData(i, j, i + "|" + j, 6);
             //    }
             //}
-            //OpenXMLImportDLL.ExcelImport.AddColumnWidth(3, 100);
-            //OpenXMLImportDLL.ExcelImport.AddRowHeight(3, 200);
-            //OpenXMLImportDLL.ExcelImport.AddRowHeight(7, 200);
-            //OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "1", 6);
-            //OpenXMLImportDLL.ExcelImport.AddCellData(3, 4, "2", 6);
-            //OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "3", 6);
-            //OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "4", 6);
-            //OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest2.xlsx");
-            //OpenXMLImportDLL.ExcelImport.ClearArray();
+
+            //obj.
+            //obj.AddCellData(2, 2, "2", 2);
+            //obj.AddColumnWidth(1, 100);
+            //obj.AddRowHeight(1, 100);
+
+            //obj.GenerateExcel(path + "/Newtest2.xlsx");
+            //obj.ClearArray();
+
+            //for (int q = 1; q <= 3; q++)
+            //{
+            //    long memory = GC.GetTotalMemory(true);
+            //    for (int i = 1; i < 1000; i++)
+            //    {
+            //        for (int j = 1; j < 10; j++)
+            //        {
+            //            OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i + "|" + j, 6);
+            //        }
+            //    }
+            //   // OpenXMLImportDLL.ExcelImport.AddColumnWidth(3, 100);
+            //    OpenXMLImportDLL.ExcelImport.AddRowHeight(3, 200);
+            //    OpenXMLImportDLL.ExcelImport.AddRowHeight(7, 200);
+            //    OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "1", 1);
+            //    OpenXMLImportDLL.ExcelImport.AddCellData(3, 4, "1", 1);
+            //    OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "3", 2);
+            //    OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "4",3);
+            //    OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "=(B2+D3+A2)*"+q,4);
+            //    OpenXMLImportDLL.ExcelImport.AddCellData(1, 1,  memory.ToString(), 1);
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, null, 1);
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "2", 1);
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "3", 2);
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "4", 3);
+                OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
+                OpenXMLImportDLL.ExcelImport.ClearArray();
+            
         }
     }
 
