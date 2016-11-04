@@ -54,8 +54,21 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
-            OpenXMLImportDLL.ExcelImport.getInstance();
+            ExcelImport obj = ExcelImport.getInstance();
+           
+            for (int i = 1; i < 100; i++)
+            {
+                for (int j = 1; j < 10; j++)
+                {
+                    obj.AddCellData(i, j, i + "|" + j, 6);
+                }
+            }
+            obj.AddCellData(2, 2, "2", 2);
+            obj.AddColumnWidth(1, 100);
+            obj.AddRowHeight(1, 100);
 
+            obj.GenerateExcel(path + "/Newtest2.xlsx");
+            obj.ClearArray();
             //for (int i = 1; i < 100; i++)
             //{
             //    for (int j = 1; j < 10; j++)

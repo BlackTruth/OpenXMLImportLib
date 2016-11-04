@@ -27,7 +27,7 @@ namespace OpenXMLImportDLL
         }
 
         //Convert Excel column number to Excel column name (1=A, 2=B)
-        private static string GetExcelColumnName(int columnNumber)
+        private string GetExcelColumnName(int columnNumber)
         {
             int dividend = columnNumber;
             string columnName = String.Empty;
@@ -43,7 +43,7 @@ namespace OpenXMLImportDLL
             return columnName;
         }
 
-        private static int GetExcelColumnNumber(string columnName)
+        private int GetExcelColumnNumber(string columnName)
         {
 
 
@@ -63,7 +63,7 @@ namespace OpenXMLImportDLL
             return sum;
         }
 
-        private static string regexReplace(string input, int sw)
+        private string regexReplace(string input, int sw)
         {
             //sw=1 remove numbers from string //sw=2 remove char from string
             if (sw == 1)
@@ -82,7 +82,7 @@ namespace OpenXMLImportDLL
         // Adds child parts and generates content of the specified part.
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
-        public static int GenerateExcel(string filePath)
+        public int GenerateExcel(string filePath)
         {
             using (SpreadsheetDocument document = SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook))
             {
@@ -112,7 +112,7 @@ namespace OpenXMLImportDLL
         }
 
         //Generates content of extendedFilePropertiesPart1.
-        private static void GenerateExtendedFilePropertiesPart1Content(ExtendedFilePropertiesPart extendedFilePropertiesPart1)
+        private void GenerateExtendedFilePropertiesPart1Content(ExtendedFilePropertiesPart extendedFilePropertiesPart1)
         {
             Ap.Properties properties1 = new Ap.Properties();
             properties1.AddNamespaceDeclaration("vt", "http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes");
@@ -179,7 +179,7 @@ namespace OpenXMLImportDLL
         }
 
         //Generates content of workbookPart1.
-        private static void GenerateWorkbookPartContent(WorkbookPart workbookPart)
+        private void GenerateWorkbookPartContent(WorkbookPart workbookPart)
         {
             Workbook workbook = new Workbook() { MCAttributes = new MarkupCompatibilityAttributes() { Ignorable = "x15" } };
             workbook.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
@@ -213,7 +213,7 @@ namespace OpenXMLImportDLL
         }
 
         // Generates content of workbookStylesPart1.
-        private static void GenerateWorkbookStylesPartContent(WorkbookStylesPart workbookStylesPart)
+        private void GenerateWorkbookStylesPartContent(WorkbookStylesPart workbookStylesPart)
         {
 
             Stylesheet stylesheet1 = new Stylesheet() { MCAttributes = new MarkupCompatibilityAttributes() { Ignorable = "x14ac" } };
@@ -1635,7 +1635,7 @@ namespace OpenXMLImportDLL
         }
 
         // Generates content of themePart1.
-        private static void GenerateThemePart1Content(ThemePart themePart1)
+        private void GenerateThemePart1Content(ThemePart themePart1)
         {
             A.Theme theme1 = new A.Theme() { Name = "Тема Office" };
             theme1.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
@@ -2205,8 +2205,9 @@ namespace OpenXMLImportDLL
         }
 
         // Generates content of worksheetPart.
-        private static void GenerateWorksheetPartContent(WorksheetPart worksheetPart)
+        private void GenerateWorksheetPartContent(WorksheetPart worksheetPart)
         {
+
             Worksheet worksheet = new Worksheet() { MCAttributes = new MarkupCompatibilityAttributes() { Ignorable = "x14ac" } };
             worksheet.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
             worksheet.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
@@ -2265,46 +2266,31 @@ namespace OpenXMLImportDLL
                 InsertCellIntoRow(cell, row);
 
             }
-
-
             Columns columns = new Columns();
-            foreach (ColumnWidth d in columnWidthArr)
-            {
-                int c = (int)d.Column;
-                double w = (double)d.Width;
-                Column column = new Column()
-                {
-                    Min = (UInt32Value)(UInt32)c,
-                    Max = (UInt32Value)(UInt32)c,
-                    Width = w,
-                    CustomWidth = true
-                };
-                columns.Append(column);
-            }
-
+            IncertColumnWidth(columns);
 
             SheetViews sheetViews = new SheetViews();
             sheetViews.Append(new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U });
             worksheet.Append(new SheetDimension() { Reference = "A1" });
             worksheet.Append(sheetViews);
             worksheet.Append(new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D });
+            worksheet.Append(columns);
             worksheet.Append(sheetData);
             worksheet.Append(new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D });
-
             worksheetPart.Worksheet = worksheet;
             worksheet.Save();
 
         }
 
         // Generates content of sharedStringTablePart1.
-        private static void GenerateSharedStringTablePart1Content(SharedStringTablePart sharedStringTablePart1)
+        private void GenerateSharedStringTablePart1Content(SharedStringTablePart sharedStringTablePart1)
         {
             SharedStringTable sharedStringTable1 = new SharedStringTable();
 
             sharedStringTablePart1.SharedStringTable = sharedStringTable1;
         }
 
-        private static void SetPackageProperties(OpenXmlPackage document)
+        private void SetPackageProperties(OpenXmlPackage document)
         {
             document.PackageProperties.Description = "Created using OpenXML SDK and .NET 3.5";
             document.PackageProperties.Version = "1.0.0.1";
@@ -2314,15 +2300,36 @@ namespace OpenXMLImportDLL
 
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
-        public static int AddColumnWidth(int columnIndex, double columnWidth)
+        public int AddColumnWidth(int columnIndex, double columnWidth)
         {
 
             columnWidthArr.Add(new ColumnWidth(columnIndex, columnWidth));
 
             return 0;
         }
+
+        private void IncertColumnWidth (Columns columns)
+        {
+        
+        foreach (ColumnWidth d in columnWidthArr)
+        {
+            int c = (int)d.Column;
+            double w = (double)d.Width;
+            Column column = new Column()
+            {
+                Min = (UInt32Value)(UInt32)c,
+                Max = (UInt32Value)(UInt32)c,
+                Width = w,
+                CustomWidth = true
+            };
+            columns.Append(column);
+        }
+    }
+
+
+
         [System.Reflection.Obfuscation(Feature = "DllExport")]
-        public static int AddRowHeight(int rowIndex, double rowHeight)
+        public int AddRowHeight(int rowIndex, double rowHeight)
         {
 
             rowHeightArr.Add(rowIndex, rowHeight);
@@ -2331,13 +2338,13 @@ namespace OpenXMLImportDLL
 
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
-        public static int AddCellData(int rowIndex, int colIndex, string data, int borderStyleId)
+        public int AddCellData(int rowIndex, int colIndex, string data, int borderStyleId)
         {
 
             cellsData.Add(new CellData(rowIndex, colIndex, data, borderStyleId));
             return 0;
         }
-        private static Row GetRow(SheetData sheetData, int rowIndex)
+        private Row GetRow(SheetData sheetData, int rowIndex)
         {
             Row newRow = null;
             foreach (Row current in sheetData.Elements<Row>())
@@ -2359,7 +2366,7 @@ namespace OpenXMLImportDLL
             return newRow;
         }
 
-        private static Row GetNewRow(int i)
+        private Row GetNewRow(int i)
         {
             double? rowHeight;
             Row row = null;
@@ -2389,7 +2396,7 @@ namespace OpenXMLImportDLL
             return row;
         }
 
-        private static void InsertCellIntoRow(Cell cell, Row row)
+        private void InsertCellIntoRow(Cell cell, Row row)
         {
 
             int cellColIndex = GetExcelColumnNumber(cell.CellReference.ToString());
@@ -2418,31 +2425,8 @@ namespace OpenXMLImportDLL
         }
 
 
-        //foreach (Cell current in sheetData.Elements<Cell>())
-        //{
-
-        //    if (GetExcelColumnNumber(current.CellReference.ToString()) <= colIndex)// && Int32.Parse(regexReplace(current.CellReference.ToString(), 2)) == rowIndex)
-        //    {
-        //        if (GetExcelColumnNumber(current.CellReference.ToString()) == colIndex)
-        //        {
-        //            row.Append(cell);
-        //          //  row.InsertBefore<Cell>(cell, current);
-        //            break;
-        //        }
-        //        row.Append(cell);
-        //        //row.InsertBefore<Cell>(cell, current);
-        //        break;
-
-        //    }
-        //}
-
-        //Console.ReadKey();
-        //row.Append(cell);
-
-        //}
-
         [System.Reflection.Obfuscation(Feature = "DllExport")]
-        public static long ClearArray()
+        public long ClearArray()
         {
             cellsData.Clear();
             rowHeightArr.Clear();
