@@ -2172,7 +2172,6 @@ namespace OpenXMLImportDLL
                     Spans = new ListValue<StringValue>() { InnerText = "1:3" },
                     DyDescent = 0.25D
                 };
-
             }
             return row;
         }
