@@ -78,6 +78,7 @@ namespace OpenXMLImportDLL
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int GenerateExcel(string filePath)
         {
+
             using (SpreadsheetDocument document = SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook))
             {
 
@@ -103,6 +104,8 @@ namespace OpenXMLImportDLL
 
             }
             return 0;
+
+
         }
 
         //Generates content of extendedFilePropertiesPart1.
@@ -2339,8 +2342,7 @@ namespace OpenXMLImportDLL
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddRowHeight(int rowIndex, double rowHeight)
         {
-
-            rowHeightArr.Add(rowIndex, rowHeight);
+            rowHeightArr[rowIndex] = rowHeight;
             return 0;
         }
 
@@ -2444,7 +2446,7 @@ namespace OpenXMLImportDLL
             rowHeightArr.Clear();
             columnWidthArr.Clear();
 
-            return 1;
+            return 0;
         }
 
 
