@@ -11,11 +11,16 @@ using A = DocumentFormat.OpenXml.Drawing;
 using Ap = DocumentFormat.OpenXml.ExtendedProperties;
 using Vt = DocumentFormat.OpenXml.VariantTypes;
 using X14 = DocumentFormat.OpenXml.Office2010.Excel;
+using excel = Microsoft.Office.Interop.Excel;
+
+
+
 
 namespace OpenXMLImportDLL
 {
     public class ExcelImport
     {
+
         static SortedList<int, double?> rowHeightArr = new SortedList<int, double?>();
         static SortedList<int, double?> columnWidthArr = new SortedList<int, double?>();
         static List<CellData> cellsData = new List<CellData>();
@@ -182,9 +187,14 @@ namespace OpenXMLImportDLL
 
             sheets.Append(sheet);
 
-            CalculationProperties calculationProperties = new CalculationProperties() { CalculationId = (UInt32Value)152511U };
-            calculationProperties.ForceFullCalculation = true;
-            calculationProperties.FullCalculationOnLoad = true;
+            CalculationProperties calculationProperties = new CalculationProperties()
+            {
+                CalculationId = (UInt32Value)152511U,
+                ForceFullCalculation = true,
+                FullCalculationOnLoad = true
+                //ReferenceMode = ReferenceModeValues.R1C1
+            };
+
 
 
             workbook.Append(fileVersion);
@@ -2021,7 +2031,7 @@ namespace OpenXMLImportDLL
                 Row row = GetRow(sheetData, i);
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
 
-                SetFormatedCellData(cell, d.Data);
+                SetFormatedCellData(cell, d.Data.ToString(), i, j);
                 InsertCellIntoRow(cell, row);
             }
 
@@ -2042,20 +2052,34 @@ namespace OpenXMLImportDLL
 
         }
 
-        private static void SetFormatedCellData(Cell cell, string data)
+        private static void SetFormatedCellData(Cell cell, string data, int i, int j)
         {
-            int number;
-            decimal dec;
+
             if (data == null || data.Length == 0)
                 return;
 
+            int number;
+            decimal dec;
             CellValue cellValue = new CellValue();
             CellFormula cellFormula = new CellFormula();
             if (data.Substring(0, 1) == "=")
             {
+
                 cell.DataType = new EnumValue<CellValues>(CellValues.String);
-                cellFormula.Text = data.Remove(0, 1);
-                cell.Append(cellFormula);
+
+                if (data.ToString().Contains('R') == true && data.ToString().Contains('C') == true)
+                {
+                    string convertedFormula = ConvertFormula(data, "R" + i.ToString() + "C" + j.ToString());
+                    cellFormula.Text = convertedFormula.Remove(0, 1);
+                    cell.Append(cellFormula);
+                }
+                else
+                {
+                    cellFormula.Text = data.Remove(0, 1);
+                    cell.Append(cellFormula);
+                }
+
+
             }
             else if (Int32.TryParse(data, out number))
             {
@@ -2204,6 +2228,17 @@ namespace OpenXMLImportDLL
             rowHeightArr.Clear();
             columnWidthArr.Clear();
             return 0;
+        }
+
+
+        public static string ConvertFormula(string inputFormula, string relativeCell)
+        {
+
+            Microsoft.Office.Interop.Excel.XlReferenceStyle f = excel.XlReferenceStyle.xlR1C1;
+            Microsoft.Office.Interop.Excel.XlReferenceStyle t = excel.XlReferenceStyle.xlA1;
+            excel.Application app = new excel.Application();
+            string output = (app.ConvertFormula(inputFormula, f, t, null, relativeCell)).ToString();
+            return output;
         }
     }
 }

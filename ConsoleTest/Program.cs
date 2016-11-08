@@ -57,41 +57,27 @@ namespace ConsoleApplication1
             OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 20);
             OpenXMLImportDLL.ExcelImport.AddRowHeight(2, 20);
             OpenXMLImportDLL.ExcelImport.AddRowHeight(3, 20);
-            for (int i = 1; i < 100; i++)
+            for (int q = 1; q <= 100; q++)
             {
-                for (int j = 1; j < 100; j++)
+
+
+                for (int i = 1; i < 7; i++)
                 {
-                    OpenXMLImportDLL.ExcelImport.AddCellData(i, j, (i + j).ToString(), 5);
+                    for (int j = 1; j < 2; j++)
+                    {
+                        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, (i + j).ToString(), 5);
+                    }
                 }
+                OpenXMLImportDLL.ExcelImport.AddCellData(7, 2, "=A1+A2", 6);
+                OpenXMLImportDLL.ExcelImport.AddCellData(7, 1, "=SUM(R[-6]C:R[-1]C)", 6);
+                // OpenXMLImportDLL.ExcelImport.AddCellData(7, 2, "=SUM(B$1:B$6)", 6);
+
+
+                OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest"+q+".xlsx");
+                OpenXMLImportDLL.ExcelImport.ClearArray();
             }
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, null, 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 3, "12,22", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 4, "Бубуб", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 5, "1", 1);
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, null, 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 3, "13.22", 6);
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(1, 50);
-
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(2, 50);
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(3, 50);
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(1, 50);
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(2, 100);
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(3, 20);
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(1, 60);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 20);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(2, 20);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(3, 20);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(3, 60);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(2, 60);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 60);
-
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 2, "4", 3);
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, null, 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 3, null, 6);
-            OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
-            OpenXMLImportDLL.ExcelImport.ClearArray();
-
+            //Console.WriteLine( OpenXMLImportDLL.ExcelImport.ConvertFormula("=SUM(R[-2]C:R[-1]C)", "R8C8").ToString());
+            //Console.Read();
 
         }
     }
