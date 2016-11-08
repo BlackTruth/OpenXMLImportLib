@@ -61,7 +61,7 @@ namespace ConsoleApplication1
             {
                 for (int j = 1; j < 100; j++)
                 {
-                    OpenXMLImportDLL.ExcelImport.AddCellData(i, j, (i + j).ToString(), 6);
+                    OpenXMLImportDLL.ExcelImport.AddCellData(i, j, (i + j).ToString(), 5);
                 }
             }
             OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "", 6);

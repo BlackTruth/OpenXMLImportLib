@@ -17,7 +17,7 @@ namespace OpenXMLImportDLL
     public class ExcelImport
     {
         static SortedList<int, double?> rowHeightArr = new SortedList<int, double?>();
-        static ArrayList columnWidthArr = new ArrayList();
+        static SortedList<int, double?> columnWidthArr = new SortedList<int, double?>();
         static List<CellData> cellsData = new List<CellData>();
 
         //Convert Excel column number to Excel column name (1=A, 2=B)
@@ -25,35 +25,27 @@ namespace OpenXMLImportDLL
         {
             int dividend = columnNumber;
             string columnName = String.Empty;
-            int modulo;
-
+            int modul;
             while (dividend > 0)
             {
-                modulo = (dividend - 1) % 26;
-                columnName = Convert.ToChar(65 + modulo).ToString() + columnName;
-                dividend = (int)((dividend - modulo) / 26);
+                modul = (dividend - 1) % 26;
+                columnName = Convert.ToChar(65 + modul).ToString() + columnName;
+                dividend = (int)((dividend - modul) / 26);
             }
-
             return columnName;
         }
 
         private static int GetExcelColumnNumber(string columnName)
         {
-
-
             string output = regexReplace(columnName, 1);
             if (string.IsNullOrEmpty(output)) throw new ArgumentNullException("columnName");
-
             output = output.ToUpperInvariant();
-
             int sum = 0;
-
             for (int i = 0; i < output.Length; i++)
             {
                 sum *= 26;
                 sum += (output[i] - 'A' + 1);
             }
-
             return sum;
         }
 
@@ -78,10 +70,8 @@ namespace OpenXMLImportDLL
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int GenerateExcel(string filePath)
         {
-
             using (SpreadsheetDocument document = SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook))
             {
-
                 ExtendedFilePropertiesPart extendedFilePropertiesPart1 = document.AddNewPart<ExtendedFilePropertiesPart>("rId3");
                 GenerateExtendedFilePropertiesPart1Content(extendedFilePropertiesPart1);
 
@@ -101,11 +91,8 @@ namespace OpenXMLImportDLL
                 GenerateSharedStringTablePart1Content(sharedStringTablePart1);
 
                 SetPackageProperties(document);
-
             }
             return 0;
-
-
         }
 
         //Generates content of extendedFilePropertiesPart1.
@@ -1438,197 +1425,7 @@ namespace OpenXMLImportDLL
             stylesheet1.Append(differentialFormats1);
             stylesheet1.Append(tableStyles1);
             stylesheet1.Append(stylesheetExtensionList1);
-
-
-
-
-
             workbookStylesPart.Stylesheet = stylesheet1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //Stylesheet stylesheet1 = new Stylesheet() { MCAttributes = new MarkupCompatibilityAttributes() { Ignorable = "x14ac" } };
-            //stylesheet1.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
-            //stylesheet1.AddNamespaceDeclaration("x14ac", "http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac");
-
-            //Fonts fonts1 = new Fonts() { Count = (UInt32Value)1U, KnownFonts = true };
-
-            //Font font1 = new Font();
-            //FontSize fontSize1 = new FontSize() { Val = 11D };
-            //Color color1 = new Color() { Theme = (UInt32Value)1U };
-            //FontName fontName1 = new FontName() { Val = "Calibri" };
-            //FontFamilyNumbering fontFamilyNumbering1 = new FontFamilyNumbering() { Val = 2 };
-            //FontScheme fontScheme1 = new FontScheme() { Val = FontSchemeValues.Minor };
-
-            //font1.Append(fontSize1);
-            //font1.Append(color1);
-            //font1.Append(fontName1);
-            //font1.Append(fontFamilyNumbering1);
-            //font1.Append(fontScheme1);
-
-            //fonts1.Append(font1);
-
-            //Fills fills1 = new Fills() { Count = (UInt32Value)2U };
-
-            //Fill fill1 = new Fill();
-            //PatternFill patternFill1 = new PatternFill() { PatternType = PatternValues.None };
-
-            //fill1.Append(patternFill1);
-
-            //Fill fill2 = new Fill();
-            //PatternFill patternFill2 = new PatternFill() { PatternType = PatternValues.Gray125 };
-
-            //fill2.Append(patternFill2);
-
-            //fills1.Append(fill1);
-            //fills1.Append(fill2);
-
-            //Borders borders1 = new Borders() { Count = (UInt32Value)2U };
-
-            //Border border1 = new Border();
-            //LeftBorder leftBorder1 = new LeftBorder();
-            //RightBorder rightBorder1 = new RightBorder();
-            //TopBorder topBorder1 = new TopBorder();
-            //BottomBorder bottomBorder1 = new BottomBorder();
-            //DiagonalBorder diagonalBorder1 = new DiagonalBorder();
-
-
-
-            //border1.Append(leftBorder1);
-            //border1.Append(rightBorder1);
-            //border1.Append(topBorder1);
-            //border1.Append(bottomBorder1);
-            //border1.Append(diagonalBorder1);
-
-            //Border border2 = new Border();
-
-            //LeftBorder leftBorder2 = new LeftBorder() { Style = BorderStyleValues.Thin };
-            //Color color2 = new Color() { Indexed = (UInt32Value)64U };
-
-            //leftBorder2.Append(color2);
-
-            //RightBorder rightBorder2 = new RightBorder() { Style = BorderStyleValues.Thin };
-            //Color color3 = new Color() { Indexed = (UInt32Value)64U };
-
-            //rightBorder2.Append(color3);
-
-            //TopBorder topBorder2 = new TopBorder() { Style = BorderStyleValues.Thin };
-            //Color color4 = new Color() { Indexed = (UInt32Value)64U };
-
-            //topBorder2.Append(color4);
-
-            //BottomBorder bottomBorder2 = new BottomBorder() { Style = BorderStyleValues.Thin };
-            //Color color5 = new Color() { Indexed = (UInt32Value)64U };
-
-            //bottomBorder2.Append(color5);
-            //DiagonalBorder diagonalBorder2 = new DiagonalBorder();
-
-            //if (true)
-            //{
-            //    border2.Append(leftBorder2);
-            //}
-
-            //if (true)
-            //{
-            //    border2.Append(rightBorder2);
-            //}
-            //if (true)
-            //{
-            //    border2.Append(topBorder2);
-            //}
-            //if (true)
-            //{
-            //    border2.Append(bottomBorder2);
-            //}
-            //if (true)
-            //{
-            //    border2.Append(diagonalBorder2);
-            //}
-
-
-
-
-
-
-            //borders1.Append(border1);
-            //borders1.Append(border2);
-
-            //CellStyleFormats cellStyleFormats1 = new CellStyleFormats() { Count = (UInt32Value)1U };
-            //CellFormat cellFormat1 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U };
-
-            //cellStyleFormats1.Append(cellFormat1);
-
-            //CellFormats cellFormats1 = new CellFormats() { Count = (UInt32Value)2U };
-            //CellFormat cellFormat2 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U };
-            //CellFormat cellFormat3 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)1U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-
-            //cellFormats1.Append(cellFormat2);
-            //cellFormats1.Append(cellFormat3);
-
-            //CellStyles cellStyles1 = new CellStyles() { Count = (UInt32Value)1U };
-            //CellStyle cellStyle1 = new CellStyle() { Name = "Обычный", FormatId = (UInt32Value)0U, BuiltinId = (UInt32Value)0U };
-
-            //cellStyles1.Append(cellStyle1);
-            //DifferentialFormats differentialFormats1 = new DifferentialFormats() { Count = (UInt32Value)0U };
-            //TableStyles tableStyles1 = new TableStyles() { Count = (UInt32Value)0U, DefaultTableStyle = "TableStyleMedium2", DefaultPivotStyle = "PivotStyleMedium9" };
-
-            //StylesheetExtensionList stylesheetExtensionList1 = new StylesheetExtensionList();
-
-            //StylesheetExtension stylesheetExtension1 = new StylesheetExtension() { Uri = "{EB79DEF2-80B8-43e5-95BD-54CBDDF9020C}" };
-            //stylesheetExtension1.AddNamespaceDeclaration("x14", "http://schemas.microsoft.com/office/spreadsheetml/2009/9/main");
-            //X14.SlicerStyles slicerStyles1 = new X14.SlicerStyles() { DefaultSlicerStyle = "SlicerStyleLight1" };
-
-            //stylesheetExtension1.Append(slicerStyles1);
-
-            //StylesheetExtension stylesheetExtension2 = new StylesheetExtension() { Uri = "{9260A510-F301-46a8-8635-F512D64BE5F5}" };
-            //stylesheetExtension2.AddNamespaceDeclaration("x15", "http://schemas.microsoft.com/office/spreadsheetml/2010/11/main");
-
-            //OpenXmlUnknownElement openXmlUnknownElement1 = OpenXmlUnknownElement.CreateOpenXmlUnknownElement("<x15:timelineStyles defaultTimelineStyle=\"TimeSlicerStyleLight1\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\" />");
-
-            //stylesheetExtension2.Append(openXmlUnknownElement1);
-
-            //stylesheetExtensionList1.Append(stylesheetExtension1);
-            //stylesheetExtensionList1.Append(stylesheetExtension2);
-
-            //stylesheet1.Append(fonts1);
-            //stylesheet1.Append(fills1);
-            //stylesheet1.Append(borders1);
-            //stylesheet1.Append(cellStyleFormats1);
-            //stylesheet1.Append(cellFormats1);
-            //stylesheet1.Append(cellStyles1);
-            //stylesheet1.Append(differentialFormats1);
-            //stylesheet1.Append(tableStyles1);
-            //stylesheet1.Append(stylesheetExtensionList1);
-
-            //workbookStylesPart.Stylesheet = stylesheet1;
         }
 
         // Generates content of themePart1.
@@ -2204,21 +2001,15 @@ namespace OpenXMLImportDLL
         // Generates content of worksheetPart.
         private static void GenerateWorksheetPartContent(WorksheetPart worksheetPart)
         {
-
             Worksheet worksheet = new Worksheet() { MCAttributes = new MarkupCompatibilityAttributes() { Ignorable = "x14ac" } };
             worksheet.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
             worksheet.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
             worksheet.AddNamespaceDeclaration("x14ac", "http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac");
             SheetDimension sheetDimension1 = new SheetDimension() { Reference = "A1:C4" };
-
             SheetViews sheetViews1 = new SheetViews();
             SheetView sheetView1 = new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U };
-
             sheetViews1.Append(sheetView1);
             SheetFormatProperties sheetFormatProperties1 = new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D };
-
-
-
             SheetData sheetData = new SheetData();
 
             foreach (CellData d in cellsData)
@@ -2230,11 +2021,8 @@ namespace OpenXMLImportDLL
                 Row row = GetRow(sheetData, i);
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
 
-
-
                 SetFormatedCellData(cell, d.Data);
                 InsertCellIntoRow(cell, row);
-
             }
 
             Columns columns = new Columns();
@@ -2258,10 +2046,8 @@ namespace OpenXMLImportDLL
         {
             int number;
             decimal dec;
-
             if (data == null || data.Length == 0)
                 return;
-
 
             CellValue cellValue = new CellValue();
             CellFormula cellFormula = new CellFormula();
@@ -2297,7 +2083,6 @@ namespace OpenXMLImportDLL
         private static void GenerateSharedStringTablePart1Content(SharedStringTablePart sharedStringTablePart1)
         {
             SharedStringTable sharedStringTable1 = new SharedStringTable();
-
             sharedStringTablePart1.SharedStringTable = sharedStringTable1;
         }
 
@@ -2309,35 +2094,28 @@ namespace OpenXMLImportDLL
             document.PackageProperties.Created = System.Xml.XmlConvert.ToDateTime(DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"), System.Xml.XmlDateTimeSerializationMode.RoundtripKind);
         }
 
-        //TODO 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddColumnWidth(int columnIndex, double columnWidth)
         {
-
-            columnWidthArr.Add(new ColumnWidth(columnIndex, columnWidth));
-
+            columnWidthArr[columnIndex] = columnWidth;
             return 0;
         }
-
         private static void InsertColumnWidth(Columns columns)
         {
 
-            foreach (ColumnWidth d in columnWidthArr)
+            foreach (var d in columnWidthArr)
             {
-                int c = (int)d.Column;
-                double w = (double)d.Width;
+
                 Column column = new Column()
                 {
-                    Min = (UInt32Value)(UInt32)c,
-                    Max = (UInt32Value)(UInt32)c,
-                    Width = w,
+                    Min = (UInt32Value)(UInt32)d.Key,
+                    Max = (UInt32Value)(UInt32)d.Key,
+                    Width = d.Value,
                     CustomWidth = true
                 };
                 columns.Append(column);
             }
         }
-
-
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddRowHeight(int rowIndex, double rowHeight)
@@ -2346,17 +2124,11 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
-
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddCellData(int rowIndex, int colIndex, string data, int borderStyleId)
         {
-
             cellsData.Add(new CellData(rowIndex, colIndex, data, borderStyleId));
-
-
             return 0;
-
-
         }
         private static Row GetRow(SheetData sheetData, int rowIndex)
         {
@@ -2367,14 +2139,11 @@ namespace OpenXMLImportDLL
                 {
                     if (current.RowIndex == rowIndex)
                         return current;
-                    //create your row here
                     newRow = GetNewRow(rowIndex);
                     sheetData.InsertBefore<Row>(newRow, current);
                     return newRow;
                 }
             }
-
-            //create your row here
             newRow = GetNewRow(rowIndex);
             sheetData.Append(newRow);
             return newRow;
@@ -2384,7 +2153,6 @@ namespace OpenXMLImportDLL
         {
             double? rowHeight;
             Row row = null;
-
             if (rowHeightArr.TryGetValue(i, out rowHeight))
             {
                 row = new Row()
@@ -2406,15 +2174,11 @@ namespace OpenXMLImportDLL
                 };
 
             }
-
             return row;
         }
-
         private static void InsertCellIntoRow(Cell cell, Row row)
         {
-
             int cellColIndex = GetExcelColumnNumber(cell.CellReference.ToString());
-
             foreach (Cell current in row.Elements<Cell>())
             {
                 int comp = GetExcelColumnNumber(current.CellReference.ToString()) - cellColIndex;
@@ -2429,15 +2193,10 @@ namespace OpenXMLImportDLL
                     row.InsertBefore<Cell>(cell, current);
                     return;
                 }
-
-
             }
-
             row.Append(cell);
             return;
-
         }
-
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static long ClearArray()
@@ -2445,77 +2204,41 @@ namespace OpenXMLImportDLL
             cellsData.Clear();
             rowHeightArr.Clear();
             columnWidthArr.Clear();
-
             return 0;
         }
-
-
-
-
     }
 }
 public class CellData
 {
     int rowIndex;
     int colIndex;
-    String data;
+    string data;
     int borderStyleId;
-
-
-    public CellData(int rowIndex, int colIndex, String data, int borderStyleId)
+    public CellData(int rowIndex, int colIndex, string data, int borderStyleId)
     {
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
         this.data = data;
         this.borderStyleId = borderStyleId;
     }
-
     public int Row
     {
         get { return rowIndex; }
         set { rowIndex = value; }
     }
-
     public int Column
     {
         get { return colIndex; }
         set { colIndex = value; }
     }
-
-    public String Data
+    public string Data
     {
         get { return data; }
         set { data = value; }
     }
-
     public int BorderStyleId
     {
         get { return borderStyleId; }
         set { borderStyleId = value; }
     }
-
-
-
-}
-public class ColumnWidth
-{
-    int columnIndex;
-    double columnWidth;
-
-    public ColumnWidth(int columnIndex, double columnWidth)
-    {
-        this.columnIndex = columnIndex;
-        this.columnWidth = columnWidth;
-    }
-    public int Column
-    {
-        get { return columnIndex; }
-        set { columnIndex = value; }
-    }
-    public double Width
-    {
-        get { return columnWidth; }
-        set { columnWidth = value; }
-    }
-
 }
