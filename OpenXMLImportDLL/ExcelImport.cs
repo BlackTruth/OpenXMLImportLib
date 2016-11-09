@@ -2074,7 +2074,7 @@ namespace OpenXMLImportDLL
 
                 if (data.ToString().Contains('R') == true && data.ToString().Contains('C') == true)
                 {
-                    string convertedFormula = ConvertFormula(data, "R" + i.ToString() + "C" + j.ToString());
+                    string convertedFormula = TransformFormulaToA1Format(data,i,GetExcelColumnName(j));
                     cellFormula.Text = convertedFormula.Remove(0, 1);
                     cell.Append(cellFormula);
                 }
@@ -2254,16 +2254,92 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
-
-        public static string ConvertFormula(string inputFormula, string relativeCell)
+        private static string TransformFormulaToA1Format(string formula, int row, string column)
         {
 
-            Microsoft.Office.Interop.Excel.XlReferenceStyle f = excel.XlReferenceStyle.xlR1C1;
-            Microsoft.Office.Interop.Excel.XlReferenceStyle t = excel.XlReferenceStyle.xlA1;
-            excel.Application app = new excel.Application();
-            string output = (app.ConvertFormula(inputFormula, f, t, null, relativeCell)).ToString();
-            return output;
+            String pattern = @"((R((\d*)|(\[[-+]?\d*\])))?C((\d+)|(\[[-+]?\d+\])))"
+                                + @"|(R((\d+)|(\[[-+]?\d+\]))(C((\d*)|(\[[-+]?\d*\])))?)";
+            return Regex.Replace(formula, pattern, new MatchEvaluator(delegate(Match match) { return TransformReferenceToA1Format(match, row, column); }));
         }
+
+        private static string TransformReferenceToA1Format(Match match, int row, string column)
+        {
+            string reference = match.Value;
+
+            string rowRefPattern = @"R\[([-+]?\d*)\]";
+            string rowAbsPattern = @"R(\d+)";
+            string colRefPattern = @"C\[([-+]?\d*)\]";
+            string colAbsPattern = @"C(\d+)";
+
+
+            Boolean isRowRef = Regex.IsMatch(reference, rowRefPattern);
+            Boolean isRowAbs = Regex.IsMatch(reference, rowAbsPattern);
+            Boolean isColRef = Regex.IsMatch(reference, colRefPattern);
+            Boolean isColAbs = Regex.IsMatch(reference, colAbsPattern);
+            Boolean hasRow = Regex.IsMatch(reference, "R");
+            Boolean hasCol = Regex.IsMatch(reference, "C");
+
+
+            string currentRowPattern = null;
+            string currentColPattern = null;
+            string result = "";
+
+            if (hasCol && !(isColAbs || isColRef))
+                result = column;
+
+            else if (isColAbs)
+                currentColPattern = colAbsPattern;
+            else
+                currentColPattern = colRefPattern;
+
+
+            if (currentColPattern != null && hasCol)
+            {
+
+                MatchCollection mc = Regex.Matches(reference, currentColPattern);
+                if (isColAbs)
+                    column = GetExcelColumnName(Int32.Parse(mc[0].Groups[1].Value));
+
+                else
+                    column = GetExcelColumnName(Int32.Parse(mc[0].Groups[1].Value) + GetExcelColumnNumber(column));
+
+
+                if (hasCol && !hasRow)
+                    return column + ":" + column;
+                else
+                    result = column;
+            }
+
+
+            if (hasRow && !(isRowAbs || isRowRef))
+                result += row;
+
+            else if (isRowAbs)
+                currentRowPattern = rowAbsPattern;
+            else
+                currentRowPattern = rowRefPattern;
+
+
+            if (currentRowPattern != null)
+            {
+                MatchCollection mc = Regex.Matches(reference, currentRowPattern);
+                if (isRowAbs)
+                    row = Int32.Parse(mc[0].Groups[1].Value);
+                else
+
+                    row = (Int32.Parse(mc[0].Groups[1].Value) + row);
+
+
+                if (hasRow && !hasCol)
+                    return row + ":" + row;
+                else
+                    result += row;
+            }
+
+
+            return result;
+        }
+
     }
 }
 public class CellData
