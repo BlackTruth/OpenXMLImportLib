@@ -22,6 +22,7 @@ namespace OpenXMLImportDLL
     {
 
         static SortedList<int, double?> rowHeightArr = new SortedList<int, double?>();
+        static List<string> mergeArr = new List<string>();
         static SortedList<int, double?> columnWidthArr = new SortedList<int, double?>();
         static List<CellData> cellsData = new List<CellData>();
 
@@ -2037,16 +2038,20 @@ namespace OpenXMLImportDLL
 
             Columns columns = new Columns();
             InsertColumnWidth(columns);
+            MergeCells mergeCells = new MergeCells() { Count = (UInt32Value)1U };
+            SetMergeCell(mergeCells);
 
             SheetViews sheetViews = new SheetViews();
             sheetViews.Append(new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U });
             worksheet.Append(new SheetDimension() { Reference = "A1" });
             worksheet.Append(sheetViews);
+
             worksheet.Append(new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D });
             if (columnWidthArr.Count > 0)
                 worksheet.Append(columns);
             worksheet.Append(sheetData);
-            worksheet.Append(new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D });
+            if (mergeArr.Count > 0)
+                worksheet.Append(mergeCells);
             worksheetPart.Worksheet = worksheet;
             worksheet.Save();
 
@@ -2149,6 +2154,13 @@ namespace OpenXMLImportDLL
         }
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
+        public static int AddMergeCell(string mergedCellsId)
+        {
+            mergeArr.Add(mergedCellsId);
+            return 0;
+        }
+
+        [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddCellData(int rowIndex, int colIndex, string data, int borderStyleId)
         {
             cellsData.Add(new CellData(rowIndex, colIndex, data, borderStyleId));
@@ -2221,12 +2233,24 @@ namespace OpenXMLImportDLL
             return;
         }
 
+        private static void SetMergeCell(MergeCells mergeCells)
+        {
+            foreach (string d in mergeArr)
+            {
+                MergeCell mergeCell = new MergeCell() { Reference = d };
+                mergeCells.Append(mergeCell);
+            }
+            
+            PageMargins pageMargins = new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D };
+        }
+
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static long ClearArray()
         {
             cellsData.Clear();
             rowHeightArr.Clear();
             columnWidthArr.Clear();
+            mergeArr.Clear();
             return 0;
         }
 

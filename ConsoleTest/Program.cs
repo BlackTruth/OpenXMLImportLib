@@ -57,7 +57,7 @@ namespace ConsoleApplication1
             OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 20);
             OpenXMLImportDLL.ExcelImport.AddRowHeight(2, 20);
             OpenXMLImportDLL.ExcelImport.AddRowHeight(3, 20);
-            for (int q = 1; q <= 100; q++)
+            for (int q = 1; q <= 1; q++)
             {
 
 
@@ -69,15 +69,14 @@ namespace ConsoleApplication1
                     }
                 }
                 OpenXMLImportDLL.ExcelImport.AddCellData(7, 2, "=A1+A2", 6);
+                OpenXMLImportDLL.ExcelImport.AddMergeCell("A1:A2");
                 OpenXMLImportDLL.ExcelImport.AddCellData(7, 1, "=SUM(R[-6]C:R[-1]C)", 6);
-                // OpenXMLImportDLL.ExcelImport.AddCellData(7, 2, "=SUM(B$1:B$6)", 6);
-
-
+                OpenXMLImportDLL.ExcelImport.AddMergeCell("C1:C2");
+               OpenXMLImportDLL.ExcelImport.AddMergeCell("E1:K12");
+               OpenXMLImportDLL.ExcelImport.AddColumnWidth(5, 100);
                 OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest"+q+".xlsx");
                 OpenXMLImportDLL.ExcelImport.ClearArray();
             }
-            //Console.WriteLine( OpenXMLImportDLL.ExcelImport.ConvertFormula("=SUM(R[-2]C:R[-1]C)", "R8C8").ToString());
-            //Console.Read();
 
         }
     }
