@@ -1304,13 +1304,24 @@ namespace OpenXMLImportDLL
             cellStyleFormats1.Append(cellFormat42);
 
             CellFormats cellFormats1 = new CellFormats() { Count = (UInt32Value)7U };
-            CellFormat cellFormat43 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U };
-            CellFormat cellFormat44 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat45 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)10U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat46 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)11U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat47 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)12U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat48 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)13U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat49 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)14U, FormatId = (UInt32Value)0U, ApplyBorder = true };
+            
+            CellFormat cellFormat43 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U, ApplyBorder = true };
+            CellFormat cellFormat44 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)10U, FormatId = (UInt32Value)0U, ApplyBorder = true };
+            CellFormat cellFormat45 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)11U, FormatId = (UInt32Value)0U, ApplyBorder = true };
+            CellFormat cellFormat46 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)12U, FormatId = (UInt32Value)0U, ApplyBorder = true };
+            CellFormat cellFormat47 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)13U, FormatId = (UInt32Value)0U, ApplyBorder = true };
+            CellFormat cellFormat48 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)14U, FormatId = (UInt32Value)0U, ApplyBorder = true };
+            CellFormat cellFormat49 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)14U, FormatId = (UInt32Value)0U, ApplyBorder = true, ApplyAlignment = true };
+            
+            Alignment alignment1 = new Alignment() { WrapText = true };
+            //Alignment alignment2 = new Alignment() { Horizontal = HorizontalAlignmentValues.Center};
+            //Alignment alignment3 = new Alignment() { Vertical = VerticalAlignmentValues.Center};
+            //Alignment alignment4 = new Alignment() { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center};
+            //Alignment alignment5 = new Alignment() { Horizontal = HorizontalAlignmentValues.Center, WrapText = true };
+            //Alignment alignment6 = new Alignment() { Vertical = VerticalAlignmentValues.Center, WrapText = true };
+            //Alignment alignment7 = new Alignment() { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center, WrapText = true };
+            //Alignment alignment8 = new Alignment() { Horizontal = HorizontalAlignmentValues.Left, Vertical = VerticalAlignmentValues.Bottom, WrapText = true };
+            cellFormat49.Append(alignment1);
 
             cellFormats1.Append(cellFormat43);
             cellFormats1.Append(cellFormat44);
@@ -1319,6 +1330,7 @@ namespace OpenXMLImportDLL
             cellFormats1.Append(cellFormat47);
             cellFormats1.Append(cellFormat48);
             cellFormats1.Append(cellFormat49);
+
 
             CellStyles cellStyles1 = new CellStyles() { Count = (UInt32Value)42U };
             CellStyle cellStyle1 = new CellStyle() { Name = "20% — акцент1", FormatId = (UInt32Value)19U, BuiltinId = (UInt32Value)30U, CustomBuiltin = true };
@@ -2054,7 +2066,7 @@ namespace OpenXMLImportDLL
                 worksheet.Append(mergeCells);
             worksheetPart.Worksheet = worksheet;
             worksheet.Save();
-
+            
         }
 
         private static void SetFormatedCellData(Cell cell, string data, int i, int j)
@@ -2072,7 +2084,7 @@ namespace OpenXMLImportDLL
 
                 cell.DataType = new EnumValue<CellValues>(CellValues.String);
 
-                if (data.ToString().Contains('R') == true && data.ToString().Contains('C') == true)
+                if (data.ToString().Contains('R') && data.ToString().Contains('C'))
                 {
                     string convertedFormula = TransformFormulaToA1Format(data,i,GetExcelColumnName(j));
                     cellFormula.Text = convertedFormula.Remove(0, 1);

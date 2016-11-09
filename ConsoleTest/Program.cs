@@ -54,29 +54,20 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 20);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(2, 20);
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(3, 20);
-            for (int q = 1; q <= 1; q++)
-            {
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "0", 0);
+            OpenXMLImportDLL.ExcelImport.AddCellData(3, 2, "1", 1);
+            OpenXMLImportDLL.ExcelImport.AddCellData(5, 3, "2", 2);
+            OpenXMLImportDLL.ExcelImport.AddCellData(7, 4, "3", 3);
+            OpenXMLImportDLL.ExcelImport.AddCellData(9, 5, "4", 4);
+            OpenXMLImportDLL.ExcelImport.AddCellData(11, 6, "5", 5);
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "АЛИГМЕЕЕНТ", 6);
+            OpenXMLImportDLL.ExcelImport.AddColumnWidth(1, 40);
 
+            OpenXMLImportDLL.ExcelImport.AddMergeCell("D2:E2");
 
-                for (int i = 1; i < 7; i++)
-                {
-                    for (int j = 1; j < 2; j++)
-                    {
-                        OpenXMLImportDLL.ExcelImport.AddCellData(i, j, (i + j).ToString(), 5);
-                    }
-                }
-                OpenXMLImportDLL.ExcelImport.AddCellData(7, 2, "=A1+A2", 6);
-                OpenXMLImportDLL.ExcelImport.AddMergeCell("A1:A2");
-                OpenXMLImportDLL.ExcelImport.AddCellData(7, 1, "=SUM(R[-6]C:R[-1]C)", 6);
-                OpenXMLImportDLL.ExcelImport.AddMergeCell("C1:C2");
-               OpenXMLImportDLL.ExcelImport.AddMergeCell("E1:K12");
-               OpenXMLImportDLL.ExcelImport.AddColumnWidth(5, 100);
-                OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest"+q+".xlsx");
-                OpenXMLImportDLL.ExcelImport.ClearArray();
-            }
+            OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 40);
+            OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
+            OpenXMLImportDLL.ExcelImport.ClearArray();
 
         }
     }
