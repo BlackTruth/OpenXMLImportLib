@@ -20,11 +20,12 @@ namespace OpenXMLImportDLL
 {
     public class ExcelImport
     {
-
+        static SortedList<int, double?> columnWidthArr = new SortedList<int, double?>();
         static SortedList<int, double?> rowHeightArr = new SortedList<int, double?>();
         static List<string> mergeArr = new List<string>();
-        static SortedList<int, double?> columnWidthArr = new SortedList<int, double?>();
         static List<CellData> cellsData = new List<CellData>();
+        static List<CellStyleFormat> cellStyleFormat = new List<CellStyleFormat>();
+
 
         //Convert Excel column number to Excel column name (1=A, 2=B)
         private static string GetExcelColumnName(int columnNumber)
@@ -209,25 +210,49 @@ namespace OpenXMLImportDLL
         // Generates content of workbookStylesPart1.
         private static void GenerateWorkbookStylesPartContent(WorkbookStylesPart workbookStylesPart)
         {
+            int counter = 1;
+            Stylesheet stylesheet = new Stylesheet();
 
-            Stylesheet stylesheet1 = new Stylesheet();
+            foreach (CellStyleFormat d in cellStyleFormat)
+            {
+                Fonts fonts = new Fonts() { Count = (UInt32Value)(UInt32)counter, KnownFonts = true };
 
-            Fonts fonts1 = new Fonts() { Count = (UInt32Value)1U };
+                Font font = new Font();
+                if (d.Bold)
+                {
+                    Bold bold = new Bold();
+                    font.Append(bold);
+                }
+                if (d.Italic)
+                {
+                    Italic italic = new Italic();
+                    font.Append(italic);
+                }
+                if (d.Underline)
+                {
+                    Underline underline = new Underline();
+                    font.Append(underline);
+                }
 
-            Font font1 = new Font();
-            FontSize fontSize1 = new FontSize() { Val = 15D };
-            Color color1 = new Color() { Theme = (UInt32Value)1U };
-            FontName fontName1 = new FontName() { Val = "Times New Roman" };
-            FontFamilyNumbering fontFamilyNumbering1 = new FontFamilyNumbering() { Val = 2 };
-            FontScheme fontScheme1 = new FontScheme() { Val = FontSchemeValues.Minor };
+                FontSize fontSize = new FontSize() { Val = d.Size };
+                Color color = new Color() { Theme = (UInt32Value)1U };
+                FontName fontName = new FontName() { Val = d.FontName };
+                FontFamilyNumbering fontFamilyNumbering = new FontFamilyNumbering() { Val = 1 };
+                FontCharSet fontCharSet = new FontCharSet() { Val = 204 };
 
-            font1.Append(fontSize1);
-            font1.Append(color1);
-            font1.Append(fontName1);
-            font1.Append(fontFamilyNumbering1);
-            font1.Append(fontScheme1);
 
-            fonts1.Append(font1);
+
+                font.Append(fontSize);
+                font.Append(color);
+                font.Append(fontName);
+                font.Append(fontFamilyNumbering);
+                font.Append(fontCharSet);
+
+                fonts.Append(font);
+                stylesheet.Append(fonts);
+            }
+
+
 
             Fills fills1 = new Fills() { Count = (UInt32Value)2U };
 
@@ -290,7 +315,7 @@ namespace OpenXMLImportDLL
 
             cellStyleFormats1.Append(cellFormat1);
 
-            CellFormats cellFormats1 = new CellFormats() { Count = (UInt32Value)7U };
+            CellFormats cellFormats1 = new CellFormats() { Count = (UInt32Value)8U };
             CellFormat cellFormat2 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U, ApplyBorder = true };
             CellFormat cellFormat3 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)1U, FormatId = (UInt32Value)0U, ApplyBorder = true };
             CellFormat cellFormat4 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)2U, FormatId = (UInt32Value)0U, ApplyBorder = true };
@@ -300,9 +325,7 @@ namespace OpenXMLImportDLL
 
 
             CellFormat cellFormat8 = new CellFormat(
-                new Alignment() { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center, WrapText = true}) { FontId = 0, FillId = 0, BorderId = 5, ApplyAlignment = true };
-                 new Font(new FontSize() { Val = 18 }, new Color() { Rgb = new HexBinaryValue() { Value = "000000" } }, new FontName() { Val = "Tahoma" });
-
+                new Alignment() { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center, WrapText = true }) { FontId = 0, FillId = 0, BorderId = 5, ApplyAlignment = true };
 
 
 
@@ -323,16 +346,16 @@ namespace OpenXMLImportDLL
             DifferentialFormats differentialFormats1 = new DifferentialFormats() { Count = (UInt32Value)0U };
             TableStyles tableStyles1 = new TableStyles() { Count = (UInt32Value)0U, DefaultTableStyle = "TableStyleMedium2", DefaultPivotStyle = "PivotStyleMedium9" };
 
-            stylesheet1.Append(fonts1);
-            stylesheet1.Append(fills1);
-            stylesheet1.Append(borders);
-            stylesheet1.Append(cellStyleFormats1);
-            stylesheet1.Append(cellFormats1);
-            stylesheet1.Append(cellStyles1);
-            stylesheet1.Append(differentialFormats1);
-            stylesheet1.Append(tableStyles1);
 
-            workbookStylesPart.Stylesheet = stylesheet1;
+            stylesheet.Append(fills1);
+            stylesheet.Append(borders);
+            stylesheet.Append(cellStyleFormats1);
+            stylesheet.Append(cellFormats1);
+            stylesheet.Append(cellStyles1);
+            stylesheet.Append(differentialFormats1);
+            stylesheet.Append(tableStyles1);
+
+            workbookStylesPart.Stylesheet = stylesheet;
 
         }
 
@@ -924,7 +947,7 @@ namespace OpenXMLImportDLL
             {
                 int i = (int)d.Row;
                 int j = (int)d.Column;
-                int k = (int)d.BorderStyleId;
+                int k = (int)d.Styleindex;
 
                 Row row = GetRow(sheetData, i);
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
@@ -1058,11 +1081,48 @@ namespace OpenXMLImportDLL
         }
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
-        public static int AddCellData(int rowIndex, int colIndex, string data, int borderStyleId)
+        public static int AddCellData(
+            int rowIndex,
+            int colIndex,
+            string data,
+            bool bold,
+            int size,
+            bool wrapText,
+            int lineStyle,
+            string fontName,
+            bool italic,
+            bool underline,
+            int horizontalAlignment,
+            int verticalAlignment,
+            bool treead,
+            bool topline,
+            bool grid)
         {
-            cellsData.Add(new CellData(rowIndex, colIndex, data, borderStyleId));
+
+            if (cellStyleFormat.Count > 0)
+            {
+                int counter = 0;
+                foreach (CellStyleFormat d in cellStyleFormat)
+                {
+                    if (d.Bold == bold & d.Size == size & d.WrapText == wrapText & d.LineStyle == lineStyle & d.FontName == fontName & d.Italic == italic & d.Underline == underline & d.HorizontalAlignment == horizontalAlignment & d.VerticalAlignment == verticalAlignment & d.Treead == treead & d.Topline == topline & d.Grid == grid)
+                    {
+                        cellsData.Add(new CellData(rowIndex, colIndex, data, counter));
+                        return 0;
+                    }
+                    counter++;
+                }
+                cellStyleFormat.Add(new CellStyleFormat(bold, size, wrapText, lineStyle, fontName, italic, underline, horizontalAlignment, verticalAlignment, treead, topline, grid));
+                cellsData.Add(new CellData(rowIndex, colIndex, data, cellStyleFormat.Count - 1));
+                return 0;
+            }
+            else
+            {
+                cellStyleFormat.Add(new CellStyleFormat(bold, size, wrapText, lineStyle, fontName, italic, underline, horizontalAlignment, verticalAlignment, treead, topline, grid));
+                cellsData.Add(new CellData(rowIndex, colIndex, data, cellStyleFormat.Count - 1));
+            }
             return 0;
         }
+
         private static Row GetRow(SheetData sheetData, int rowIndex)
         {
             Row newRow = null;
@@ -1159,6 +1219,8 @@ namespace OpenXMLImportDLL
             return Regex.Replace(formula, pattern, new MatchEvaluator(delegate(Match match) { return TransformReferenceToA1Format(match, row, column); }));
         }
 
+
+
         private static string TransformReferenceToA1Format(Match match, int row, string column)
         {
             string reference = match.Value;
@@ -1244,13 +1306,13 @@ public class CellData
     int rowIndex;
     int colIndex;
     string data;
-    int borderStyleId;
-    public CellData(int rowIndex, int colIndex, string data, int borderStyleId)
+    int styleIndex;
+    public CellData(int rowIndex, int colIndex, string data, int styleIndex)
     {
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
         this.data = data;
-        this.borderStyleId = borderStyleId;
+        this.styleIndex = styleIndex;
     }
     public int Row
     {
@@ -1267,9 +1329,149 @@ public class CellData
         get { return data; }
         set { data = value; }
     }
-    public int BorderStyleId
+    public int Styleindex
     {
-        get { return borderStyleId; }
-        set { borderStyleId = value; }
+        get { return styleIndex; }
+        set { styleIndex = value; }
     }
 }
+
+
+class CellStyleFormat
+{
+    bool bold;
+    double size;
+    bool wrapText;
+    int lineStyle;
+    string fontName;
+    bool italic;
+    bool underline;
+    int horizontalAlignment;
+    int verticalAlignment;
+    bool treead;
+    bool topline;
+    bool grid;
+    public CellStyleFormat(
+        bool bold,
+        double size,
+        bool wrapText,
+        int lineStyle,
+        string fontName,
+        bool italic,
+        bool underline,
+        int horizontalAlignment,
+        int verticalAlignment,
+        bool treead,
+        bool topline,
+        bool grid)
+    {
+        this.bold = bold;
+        this.size = size;
+        this.wrapText = wrapText;
+        this.lineStyle = lineStyle;
+        this.fontName = fontName;
+        this.italic = italic;
+        this.underline = underline;
+        this.horizontalAlignment = horizontalAlignment;
+        this.verticalAlignment = verticalAlignment;
+        this.treead = treead;
+        this.topline = topline;
+        this.grid = grid;
+    }
+
+    public bool Bold
+    {
+        get { return bold; }
+        set { bold = value; }
+    }
+    public double Size
+    {
+        get { return size; }
+        set { size = value; }
+    }
+    public bool WrapText
+    {
+        get { return wrapText; }
+        set { wrapText = value; }
+    }
+    public int LineStyle
+    {
+        get { return lineStyle; }
+        set { lineStyle = value; }
+    }
+    public string FontName
+    {
+        get { return fontName; }
+        set { fontName = value; }
+    }
+    public bool Italic
+    {
+        get { return italic; }
+        set { italic = value; }
+    }
+    public bool Underline
+    {
+        get { return underline; }
+        set { underline = value; }
+    }
+    public int HorizontalAlignment
+    {
+        get { return horizontalAlignment; }
+        set { horizontalAlignment = value; }
+    }
+    public int VerticalAlignment
+    {
+        get { return verticalAlignment; }
+        set { verticalAlignment = value; }
+    }
+    public bool Treead
+    {
+        get { return treead; }
+        set { treead = value; }
+    }
+    public bool Topline
+    {
+        get { return topline; }
+        set { topline = value; }
+    }
+    public bool Grid
+    {
+        get { return grid; }
+        set { grid = value; }
+    }
+
+}
+
+
+// boolean ib_setvisible = true //При разрушении объекта сделать визуальным
+//boolean ib_setprint = false //При разрушении объекта отправить на печать
+//integer   ii_Orientation = 1 //Ориентация (1- книжная, 2- альбомная)
+//boolean ib_Zoom = false //
+//long il_startrow = 1 // Строка с которой начинается вывод таблицы
+//integer ii_setFitToPagesWide = 1 //Разместить не более чем на 1 странице в ширину
+//integer ii_setFitToPagesTall =  1 //Разместить не более чем на 1 страниц в высоту
+//integer ii_nozms = 0 //Обрезать не значащие нули вместе с разделителем
+
+
+////Параметры шрифта и ячейки, применяются для каждой выводимой ячейки
+//boolean ib_setBold = false //Жирный
+//integer ii_setsize = 12 //Размер шрифта
+//string is_setFontName = "Times New Roman" 
+//boolean ib_setItalic = False //Курсив
+//boolean ib_setUnderline = False //Подчеркнутый
+
+//boolean ib_setWrapText = False  //Переносить по словам
+//integer ii_setLineStyle = 0 //Границы
+// integer ii_setHorizontalAlignment = 1 //Выравнивание по горизонтали (3 - по центру)
+// integer ii_setVerticalAlignment = 2 //Выравнивание по вертикали (2- по центру)
+// boolean ib_treead = false //Разделять на триады числовые значения
+// boolean ib_topline  = false //Верхняя граница
+// boolean ib_grid  = false //Видимость сетки
+
+
+////---------
+//string is_fn = 'c:\temp\temp.xls'
+//boolean ib_openfile = true
+
+//// Стиль ссылки
+//// Application.ReferenceStyle = xlA1

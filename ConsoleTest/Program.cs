@@ -54,18 +54,20 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "0", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(3, 2, "1", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(5, 3, "2", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(7, 4, "3", 6);
-            OpenXMLImportDLL.ExcelImport.AddCellData(9, 5, "4", 5);
-            OpenXMLImportDLL.ExcelImport.AddCellData(11, 6, "5", 5);
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "АЛИГМЕЕЕНТ", 5);
-            OpenXMLImportDLL.ExcelImport.AddColumnWidth(1, 40);
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "asdasdas", true, 20, true, 1, "Times New Roman", true, false, 1, 1, true, true, true);
+           
+            //OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "0");
+            //OpenXMLImportDLL.ExcelImport.AddCellData(3, 2, "1");
+            //OpenXMLImportDLL.ExcelImport.AddCellData(5, 3, "2");
+            //OpenXMLImportDLL.ExcelImport.AddCellData(7, 4, "3");
+            //OpenXMLImportDLL.ExcelImport.AddCellData(9, 5, "4");
+            //OpenXMLImportDLL.ExcelImport.AddCellData(11, 6, "5");
+            //OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "АЛИГМЕЕЕНТ");
+            //OpenXMLImportDLL.ExcelImport.AddColumnWidth(1, 40);
 
-            OpenXMLImportDLL.ExcelImport.AddMergeCell("D2:E2");
+            //OpenXMLImportDLL.ExcelImport.AddMergeCell("D2:E2");
 
-            OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 40);
+            //OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 40);
             OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
             OpenXMLImportDLL.ExcelImport.ClearArray();
 
