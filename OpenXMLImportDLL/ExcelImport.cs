@@ -24,8 +24,8 @@ namespace OpenXMLImportDLL
         static SortedList<int, double?> rowHeightArr = new SortedList<int, double?>();
         static List<string> mergeArr = new List<string>();
         static List<CellData> cellsData = new List<CellData>();
-        static List<CellStyleFormat> cellStyleFormat = new List<CellStyleFormat>();
-
+        static List<CellStyleFormat> cellStyleFormatList = new List<CellStyleFormat>();
+        static List<FontStyleFormat> fontStyleFormatList = new List<FontStyleFormat>();
 
         //Convert Excel column number to Excel column name (1=A, 2=B)
         private static string GetExcelColumnName(int columnNumber)
@@ -99,6 +99,8 @@ namespace OpenXMLImportDLL
 
                 SetPackageProperties(document);
             }
+
+            ClearArray();
             return 0;
         }
 
@@ -210,51 +212,12 @@ namespace OpenXMLImportDLL
         // Generates content of workbookStylesPart1.
         private static void GenerateWorkbookStylesPartContent(WorkbookStylesPart workbookStylesPart)
         {
-            int counter = 1;
-            Stylesheet stylesheet = new Stylesheet();
-
-            foreach (CellStyleFormat d in cellStyleFormat)
-            {
-                Fonts fonts = new Fonts() { Count = (UInt32Value)(UInt32)counter, KnownFonts = true };
-
-                Font font = new Font();
-                if (d.Bold)
-                {
-                    Bold bold = new Bold();
-                    font.Append(bold);
-                }
-                if (d.Italic)
-                {
-                    Italic italic = new Italic();
-                    font.Append(italic);
-                }
-                if (d.Underline)
-                {
-                    Underline underline = new Underline();
-                    font.Append(underline);
-                }
-
-                FontSize fontSize = new FontSize() { Val = d.Size };
-                Color color = new Color() { Theme = (UInt32Value)1U };
-                FontName fontName = new FontName() { Val = d.FontName };
-                FontFamilyNumbering fontFamilyNumbering = new FontFamilyNumbering() { Val = 1 };
-                FontCharSet fontCharSet = new FontCharSet() { Val = 204 };
+            int counterFonts = 0;
+            Stylesheet stylesheet1 = new Stylesheet();
 
 
 
-                font.Append(fontSize);
-                font.Append(color);
-                font.Append(fontName);
-                font.Append(fontFamilyNumbering);
-                font.Append(fontCharSet);
-
-                fonts.Append(font);
-                stylesheet.Append(fonts);
-            }
-
-
-
-            Fills fills1 = new Fills() { Count = (UInt32Value)2U };
+            Fills fills1 = new Fills();
 
             Fill fill1 = new Fill();
             PatternFill patternFill1 = new PatternFill() { PatternType = PatternValues.None };
@@ -310,52 +273,101 @@ namespace OpenXMLImportDLL
             borders.Append(allBorder);
 
 
-            CellStyleFormats cellStyleFormats1 = new CellStyleFormats() { Count = (UInt32Value)1U };
+
+
+            Fonts fonts = new Fonts();
+
+            Font defFont = new Font();
+            FontSize dFontSize = new FontSize() { Val = 11D };
+            FontName dFontName = new FontName() { Val = "Calibri" };
+            defFont.Append(dFontSize);
+            defFont.Append(dFontName);
+            fonts.Append(defFont);
+
+            foreach (FontStyleFormat f in fontStyleFormatList)
+            {
+
+                Font font = new Font();
+                if (f.Bold)
+                {
+                    Bold bold = new Bold();
+                    font.Append(bold);
+                }
+                if (f.Italic)
+                {
+                    Italic italic = new Italic();
+                    font.Append(italic);
+                }
+                if (f.Underline)
+                {
+                    Underline underline = new Underline();
+                    font.Append(underline);
+                }
+                FontSize fontSize = new FontSize() { Val = f.Size };
+                font.Append(fontSize);
+
+                FontName fontName = new FontName() { Val = f.FontName };
+                font.Append(fontName);
+
+                fonts.Append(font);
+                counterFonts++;
+            }
+
+
+
+
+            CellStyleFormats cellStyleFormats1 = new CellStyleFormats();
             CellFormat cellFormat1 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U };
 
             cellStyleFormats1.Append(cellFormat1);
 
-            CellFormats cellFormats1 = new CellFormats() { Count = (UInt32Value)8U };
-            CellFormat cellFormat2 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat3 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)1U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat4 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)2U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat5 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)3U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat6 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)4U, FormatId = (UInt32Value)0U, ApplyBorder = true };
-            CellFormat cellFormat7 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)5U, FormatId = (UInt32Value)0U, ApplyBorder = true };
+            CellFormats cellFormats = new CellFormats();
+            CellFormat dCellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U };
+            cellFormats.Append(dCellFormat);
+
+            //if (counterFonts > 0)
+            //    for (int i = 1; i <= counterFonts; i++)
+            //    {
+            //        CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)(UInt32)i, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U, ApplyFont = true };
+            //        cellFormats.Append(cellFormat);
+            //    }
+
+            foreach (CellStyleFormat d in cellStyleFormatList)
+            {
+                CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)(UInt32)d.FontIndex, FillId = (UInt32Value)0U, BorderId = (UInt32Value)(UInt32)d.LineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true };
+                cellFormats.Append(cellFormat);
+               
+                if(d.WrapText)
+                {
+                  Alignment alignment = new Alignment() { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center, WrapText = true };
+                  cellFormat.Append(alignment);
+                }
+
+            }
 
 
-            CellFormat cellFormat8 = new CellFormat(
-                new Alignment() { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center, WrapText = true }) { FontId = 0, FillId = 0, BorderId = 5, ApplyAlignment = true };
 
-
-
-
-            cellFormats1.Append(cellFormat2);
-            cellFormats1.Append(cellFormat3);
-            cellFormats1.Append(cellFormat4);
-            cellFormats1.Append(cellFormat5);
-            cellFormats1.Append(cellFormat6);
-            cellFormats1.Append(cellFormat7);
-            cellFormats1.Append(cellFormat8);
-
-
-            CellStyles cellStyles1 = new CellStyles() { Count = (UInt32Value)1U };
+            CellStyles cellStyles1 = new CellStyles();
             CellStyle cellStyle1 = new CellStyle() { Name = "Normal", FormatId = (UInt32Value)0U, BuiltinId = (UInt32Value)0U };
 
             cellStyles1.Append(cellStyle1);
-            DifferentialFormats differentialFormats1 = new DifferentialFormats() { Count = (UInt32Value)0U };
+            DifferentialFormats differentialFormats1 = new DifferentialFormats();
             TableStyles tableStyles1 = new TableStyles() { Count = (UInt32Value)0U, DefaultTableStyle = "TableStyleMedium2", DefaultPivotStyle = "PivotStyleMedium9" };
 
+            stylesheet1.Append(fonts);
+            stylesheet1.Append(fills1);
+            stylesheet1.Append(borders);
+            stylesheet1.Append(cellStyleFormats1);
+            stylesheet1.Append(cellFormats);
+            stylesheet1.Append(cellStyles1);
+            stylesheet1.Append(differentialFormats1);
+            stylesheet1.Append(tableStyles1);
 
-            stylesheet.Append(fills1);
-            stylesheet.Append(borders);
-            stylesheet.Append(cellStyleFormats1);
-            stylesheet.Append(cellFormats1);
-            stylesheet.Append(cellStyles1);
-            stylesheet.Append(differentialFormats1);
-            stylesheet.Append(tableStyles1);
+            workbookStylesPart.Stylesheet = stylesheet1;
 
-            workbookStylesPart.Stylesheet = stylesheet;
+
+
+
 
         }
 
@@ -1095,31 +1107,16 @@ namespace OpenXMLImportDLL
             int horizontalAlignment,
             int verticalAlignment,
             bool treead,
-            bool topline,
             bool grid)
         {
+            int ffi = SetFontFormat(bold, size, fontName, italic, underline);
+            int cfi = SetCellFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, grid, ffi);
+            cellsData.Add(new CellData(rowIndex, colIndex, data, cfi));
 
-            if (cellStyleFormat.Count > 0)
-            {
-                int counter = 0;
-                foreach (CellStyleFormat d in cellStyleFormat)
-                {
-                    if (d.Bold == bold & d.Size == size & d.WrapText == wrapText & d.LineStyle == lineStyle & d.FontName == fontName & d.Italic == italic & d.Underline == underline & d.HorizontalAlignment == horizontalAlignment & d.VerticalAlignment == verticalAlignment & d.Treead == treead & d.Topline == topline & d.Grid == grid)
-                    {
-                        cellsData.Add(new CellData(rowIndex, colIndex, data, counter));
-                        return 0;
-                    }
-                    counter++;
-                }
-                cellStyleFormat.Add(new CellStyleFormat(bold, size, wrapText, lineStyle, fontName, italic, underline, horizontalAlignment, verticalAlignment, treead, topline, grid));
-                cellsData.Add(new CellData(rowIndex, colIndex, data, cellStyleFormat.Count - 1));
-                return 0;
-            }
-            else
-            {
-                cellStyleFormat.Add(new CellStyleFormat(bold, size, wrapText, lineStyle, fontName, italic, underline, horizontalAlignment, verticalAlignment, treead, topline, grid));
-                cellsData.Add(new CellData(rowIndex, colIndex, data, cellStyleFormat.Count - 1));
-            }
+
+
+
+
             return 0;
         }
 
@@ -1201,15 +1198,55 @@ namespace OpenXMLImportDLL
             PageMargins pageMargins = new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D };
         }
 
-        [System.Reflection.Obfuscation(Feature = "DllExport")]
-        public static long ClearArray()
+
+        private static int SetCellFormat(
+            bool wrapText,
+            int lineStyle,
+            int horizontalAlignment,
+            int verticalAlignment,
+            bool treead,
+            bool grid,
+            int fontIndex)
+        {
+            CellStyleFormat currentCell = new CellStyleFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, grid, fontIndex);
+
+            int counter = 1;
+            foreach (CellStyleFormat d in cellStyleFormatList)
+            {
+                if (currentCell.Equals(d))
+                    return counter;
+                counter++;
+            }
+            cellStyleFormatList.Add(currentCell);
+            return cellStyleFormatList.Count;
+
+        }
+        private static int SetFontFormat(bool bold, int size, string fontName, bool italic, bool underline)
+        {
+            FontStyleFormat currentFont = new FontStyleFormat(bold, size, fontName, italic, underline);
+
+            int fontCounter = 1;
+            foreach (FontStyleFormat f in fontStyleFormatList)
+            {
+                if (currentFont.Equals(f))
+                    return fontCounter;
+                fontCounter++;
+            }
+            fontStyleFormatList.Add(currentFont);
+            return fontStyleFormatList.Count;
+        }
+
+        private static long ClearArray()
         {
             cellsData.Clear();
             rowHeightArr.Clear();
             columnWidthArr.Clear();
             mergeArr.Clear();
+            fontStyleFormatList.Clear();
+            cellStyleFormatList.Clear();
             return 0;
         }
+
 
         private static string TransformFormulaToA1Format(string formula, int row, string column)
         {
@@ -1339,56 +1376,32 @@ public class CellData
 
 class CellStyleFormat
 {
-    bool bold;
-    double size;
     bool wrapText;
     int lineStyle;
-    string fontName;
-    bool italic;
-    bool underline;
     int horizontalAlignment;
     int verticalAlignment;
     bool treead;
-    bool topline;
     bool grid;
+    int fontIndex;
     public CellStyleFormat(
-        bool bold,
-        double size,
         bool wrapText,
         int lineStyle,
-        string fontName,
-        bool italic,
-        bool underline,
         int horizontalAlignment,
         int verticalAlignment,
         bool treead,
-        bool topline,
-        bool grid)
+        bool grid,
+        int fontIndex)
     {
-        this.bold = bold;
-        this.size = size;
         this.wrapText = wrapText;
         this.lineStyle = lineStyle;
-        this.fontName = fontName;
-        this.italic = italic;
-        this.underline = underline;
         this.horizontalAlignment = horizontalAlignment;
         this.verticalAlignment = verticalAlignment;
         this.treead = treead;
-        this.topline = topline;
         this.grid = grid;
+        this.fontIndex = fontIndex;
     }
 
-    public bool Bold
-    {
-        get { return bold; }
-        set { bold = value; }
-    }
-    public double Size
-    {
-        get { return size; }
-        set { size = value; }
-    }
+
     public bool WrapText
     {
         get { return wrapText; }
@@ -1399,21 +1412,7 @@ class CellStyleFormat
         get { return lineStyle; }
         set { lineStyle = value; }
     }
-    public string FontName
-    {
-        get { return fontName; }
-        set { fontName = value; }
-    }
-    public bool Italic
-    {
-        get { return italic; }
-        set { italic = value; }
-    }
-    public bool Underline
-    {
-        get { return underline; }
-        set { underline = value; }
-    }
+
     public int HorizontalAlignment
     {
         get { return horizontalAlignment; }
@@ -1429,16 +1428,82 @@ class CellStyleFormat
         get { return treead; }
         set { treead = value; }
     }
-    public bool Topline
-    {
-        get { return topline; }
-        set { topline = value; }
-    }
     public bool Grid
     {
         get { return grid; }
         set { grid = value; }
     }
+    public int FontIndex
+    {
+        get { return fontIndex; }
+        set { fontIndex = value; }
+    }
+    public override bool Equals(object obj)
+    {
+        CellStyleFormat cfs = obj as CellStyleFormat;
+        if (cfs == null)
+            return false;
+        return this.WrapText == cfs.wrapText && this.LineStyle == cfs.lineStyle && this.HorizontalAlignment == cfs.horizontalAlignment && this.VerticalAlignment == cfs.verticalAlignment && this.Treead == cfs.treead && this.Grid == cfs.grid && this.fontIndex == cfs.fontIndex;
+    }
+}
+
+
+class FontStyleFormat
+{
+    bool bold;
+    double size;
+    string fontName;
+    bool italic;
+    bool underline;
+    public FontStyleFormat(
+        bool bold,
+        double size,
+        string fontName,
+        bool italic,
+        bool underline)
+    {
+        this.bold = bold;
+        this.size = size;
+        this.fontName = fontName;
+        this.italic = italic;
+        this.underline = underline;
+
+    }
+
+    public bool Bold
+    {
+        get { return bold; }
+        set { bold = value; }
+    }
+    public double Size
+    {
+        get { return size; }
+        set { size = value; }
+    }
+
+    public string FontName
+    {
+        get { return fontName; }
+        set { fontName = value; }
+    }
+    public bool Italic
+    {
+        get { return italic; }
+        set { italic = value; }
+    }
+    public bool Underline
+    {
+        get { return underline; }
+        set { underline = value; }
+    }
+    public override bool Equals(object obj)
+    {
+        FontStyleFormat ffs = obj as FontStyleFormat;
+        if (ffs == null)
+            return false;
+        return this.Bold == ffs.bold && this.Size == ffs.size && this.FontName.CompareTo(ffs.fontName) == 0 && this.Italic == ffs.italic && this.Underline == ffs.underline;
+    }
+
 
 }
 
