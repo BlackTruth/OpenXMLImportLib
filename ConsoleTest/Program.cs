@@ -54,28 +54,13 @@ namespace ConsoleApplication1
 
         static void AddExcel(string path)
         {
-            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "Test!!!", true, 21, false, 5, "Calibri", false, true, 1, 1, true, true);
-          //  OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "1", true, 12, true, 0, "Tahoma", false, false, 1, 1, true, true);
-            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "2", false, 11, false, 1, "Tahoma", false, false, 1, 1, true, true);
-            OpenXMLImportDLL.ExcelImport.AddCellData(3, 1, "3", false, 13, true, 2, "Tahoma", true, true, 1, 1, true, true);
-            OpenXMLImportDLL.ExcelImport.AddCellData(4, 1, "4", true, 12, false, 3, "Tahoma", true, true, 1, 1, true, true);
-            OpenXMLImportDLL.ExcelImport.AddCellData(5, 1, "5", true, 11, true, 4, "Times New Roman", true, false, 1, 1, true, true);
-            OpenXMLImportDLL.ExcelImport.AddCellData(6, 1, "6", true, 14, false, 5, "Times New Roman", true, true, 1, 1, true, true);
-            OpenXMLImportDLL.ExcelImport.AddCellData(7, 1, "7", false, 12, true, 5, "Comic Sans MS", true, false, 1, 1, true, true);
-
-
-            //OpenXMLImportDLL.ExcelImport.AddCellData(1, 2, "0");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(3, 2, "1");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(5, 3, "2");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(7, 4, "3");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(9, 5, "4");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(11, 6, "5");
-            //OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "АЛИГМЕЕЕНТ");
-            //OpenXMLImportDLL.ExcelImport.AddColumnWidth(1, 40);
-
-            //OpenXMLImportDLL.ExcelImport.AddMergeCell("D2:E2");
-
-            //OpenXMLImportDLL.ExcelImport.AddRowHeight(1, 40);
+            OpenXMLImportDLL.ExcelImport.AddCellData(1, 1, "Test!!!", true, 21, false, 5, "Calibri", false, true, 0, 0, false);
+            OpenXMLImportDLL.ExcelImport.AddCellData(2, 1, "241241.12", false, 11, false, 1, "Tahoma", false, false, 1, 1, true);
+            OpenXMLImportDLL.ExcelImport.AddCellData(3, 1, "13433,14", false, 13, true, 2, "Tahoma", true, true,2, 2, true);
+            OpenXMLImportDLL.ExcelImport.AddCellData(4, 1, "4", true, 12, false, 3, "Tahoma", true, true, 3, 3, false);
+            OpenXMLImportDLL.ExcelImport.AddCellData(5, 1, "5", true, 11, true, 4, "Times New Roman", true, false, 3,2, false);
+            OpenXMLImportDLL.ExcelImport.AddCellData(6, 1, "6", true, 14, false, 5, "Times New Roman", true, true, 3, 1, false);
+           OpenXMLImportDLL.ExcelImport.AddCellData(7, 1, "7", false, 12, true, 5, "Comic Sans MS", true, false, 2, 1, true);
             OpenXMLImportDLL.ExcelImport.GenerateExcel(path + "/Newtest.xlsx");
             
         }

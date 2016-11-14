@@ -20,12 +20,13 @@ namespace OpenXMLImportDLL
 {
     public class ExcelImport
     {
-        static SortedList<int, double?> columnWidthArr = new SortedList<int, double?>();
-        static SortedList<int, double?> rowHeightArr = new SortedList<int, double?>();
-        static List<string> mergeArr = new List<string>();
-        static List<CellData> cellsData = new List<CellData>();
-        static List<CellStyleFormat> cellStyleFormatList = new List<CellStyleFormat>();
-        static List<FontStyleFormat> fontStyleFormatList = new List<FontStyleFormat>();
+        static private SortedList<int, double?> columnWidthArr = new SortedList<int, double?>();
+        static private SortedList<int, double?> rowHeightArr = new SortedList<int, double?>();
+        static private List<NPageSetup> nPageSetup = new List<NPageSetup>();
+        static private List<string> mergeArr = new List<string>();
+        static private List<CellData> cellsData = new List<CellData>();
+        static private List<CellStyleFormat> cellStyleFormatList = new List<CellStyleFormat>();
+        static private List<FontStyleFormat> fontStyleFormatList = new List<FontStyleFormat>();
 
         //Convert Excel column number to Excel column name (1=A, 2=B)
         private static string GetExcelColumnName(int columnNumber)
@@ -44,7 +45,7 @@ namespace OpenXMLImportDLL
 
         private static int GetExcelColumnNumber(string columnName)
         {
-            string output = regexReplace(columnName, 1);
+            string output = RegexReplace(columnName, 1);
             if (string.IsNullOrEmpty(output)) throw new ArgumentNullException("columnName");
             output = output.ToUpperInvariant();
             int sum = 0;
@@ -56,7 +57,7 @@ namespace OpenXMLImportDLL
             return sum;
         }
 
-        private static string regexReplace(string input, int sw)
+        private static string RegexReplace(string input, int sw)
         {
             //sw=1 remove numbers from string //sw=2 remove char from string
             if (sw == 1)
@@ -104,7 +105,7 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
-        //Generates content of extendedFilePropertiesPart1.
+        // Generates content of extendedFilePropertiesPart1.
         //private static void GenerateExtendedFilePropertiesPart1Content(ExtendedFilePropertiesPart extendedFilePropertiesPart1)
         //{
         //    Ap.Properties properties1 = new Ap.Properties();
@@ -212,7 +213,6 @@ namespace OpenXMLImportDLL
         // Generates content of workbookStylesPart1.
         private static void GenerateWorkbookStylesPartContent(WorkbookStylesPart workbookStylesPart)
         {
-            int counterFonts = 0;
             Stylesheet stylesheet1 = new Stylesheet();
 
 
@@ -231,6 +231,9 @@ namespace OpenXMLImportDLL
 
             fills1.Append(fill1);
             fills1.Append(fill2);
+
+            NumberingFormats numberingFormats = new NumberingFormats();
+            NumberingFormat numberingFormat = new NumberingFormat() { NumberFormatId = (UInt32Value)43U, FormatCode = "_-* #,##0.00\\ _₽_-;\\-* #,##0.00\\ _₽_-;_-* \"-\"??\\ _₽_-;_-@_-" };
 
 
 
@@ -310,7 +313,6 @@ namespace OpenXMLImportDLL
                 font.Append(fontName);
 
                 fonts.Append(font);
-                counterFonts++;
             }
 
 
@@ -325,23 +327,44 @@ namespace OpenXMLImportDLL
             CellFormat dCellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U };
             cellFormats.Append(dCellFormat);
 
-            //if (counterFonts > 0)
-            //    for (int i = 1; i <= counterFonts; i++)
-            //    {
-            //        CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)(UInt32)i, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U, ApplyFont = true };
-            //        cellFormats.Append(cellFormat);
-            //    }
-
-            foreach (CellStyleFormat d in cellStyleFormatList)
+            foreach (CellStyleFormat f in cellStyleFormatList)
             {
-                CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)(UInt32)d.FontIndex, FillId = (UInt32Value)0U, BorderId = (UInt32Value)(UInt32)d.LineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true };
-                cellFormats.Append(cellFormat);
-               
-                if(d.WrapText)
+                int treeadsw = 0;
+                if (f.Treead)
                 {
-                  Alignment alignment = new Alignment() { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center, WrapText = true };
-                  cellFormat.Append(alignment);
+                    treeadsw = 43;
                 }
+
+
+                CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)(UInt32)treeadsw, FontId = (UInt32Value)(UInt32)f.FontIndex, FillId = (UInt32Value)0U, BorderId = (UInt32Value)(UInt32)f.LineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true, ApplyNumberFormat = f.Treead };
+                cellFormats.Append(cellFormat);
+
+                VerticalAlignmentValues vav;
+                HorizontalAlignmentValues hav;
+
+                switch (f.HorizontalAlignment)
+                {
+                    default: hav = HorizontalAlignmentValues.Distributed; break;
+                    case 1: hav = HorizontalAlignmentValues.Left; break;
+                    case 2: hav = HorizontalAlignmentValues.Right; break;
+                    case 3: hav = HorizontalAlignmentValues.Center; break;
+                }
+
+                switch (f.VerticalAlignment)
+                {
+                    default: vav = VerticalAlignmentValues.Distributed; break;
+                    case 1: vav = VerticalAlignmentValues.Bottom; break;
+                    case 2: vav = VerticalAlignmentValues.Center; break;
+                    case 3: vav = VerticalAlignmentValues.Top; break;
+                }
+
+
+                Alignment alignment = new Alignment() { Horizontal = hav, Vertical = vav, WrapText = f.WrapText };
+                cellFormat.Append(alignment);
+
+
+
+
 
             }
 
@@ -948,12 +971,34 @@ namespace OpenXMLImportDLL
             worksheet.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
             worksheet.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
             worksheet.AddNamespaceDeclaration("x14ac", "http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac");
-            SheetDimension sheetDimension1 = new SheetDimension() { Reference = "A1:C4" };
-            SheetViews sheetViews1 = new SheetViews();
-            SheetView sheetView1 = new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U };
-            sheetViews1.Append(sheetView1);
-            SheetFormatProperties sheetFormatProperties1 = new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D };
             SheetData sheetData = new SheetData();
+            PageSetup pageSetup = new PageSetup();
+            OrientationValues orientation = OrientationValues.Default;
+            bool showGreed = true;
+            if (nPageSetup.Count > 0)
+            {
+                SheetProperties sheetProperties = new SheetProperties();
+                PageSetupProperties pageSetupProperties = new PageSetupProperties() { FitToPage = true };
+                sheetProperties.Append(pageSetupProperties);
+                NPageSetup ps = nPageSetup[0];
+                if (ps.LandscapeOrientation)
+                    orientation = OrientationValues.Landscape;
+                pageSetup = new PageSetup() { PaperSize = (UInt32Value)9U, Orientation = orientation, FitToWidth = (UInt32Value)(UInt32)ps.FitToPagesWide, FitToHeight = (UInt32Value)(UInt32)ps.FitToPagesTail, HorizontalDpi = (UInt32Value)300U, VerticalDpi = (UInt32Value)300U, Id = "rId1" };
+                if (!ps.Grid)
+                    showGreed = false;
+                worksheet.Append(sheetProperties);
+            }
+   
+         
+
+          
+            SheetViews sheetViews = new SheetViews();
+            sheetViews.Append(new SheetView() { ShowGridLines = showGreed, TabSelected = true, WorkbookViewId = (UInt32Value)0U });
+            worksheet.Append(new SheetDimension() { Reference = "A1" });
+            worksheet.Append(sheetViews);
+
+
+
 
             foreach (CellData d in cellsData)
             {
@@ -963,7 +1008,6 @@ namespace OpenXMLImportDLL
 
                 Row row = GetRow(sheetData, i);
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
-
                 SetFormatedCellData(cell, d.Data.ToString(), i, j);
                 InsertCellIntoRow(cell, row);
             }
@@ -973,11 +1017,6 @@ namespace OpenXMLImportDLL
             MergeCells mergeCells = new MergeCells() { Count = (UInt32Value)1U };
             SetMergeCell(mergeCells);
 
-            SheetViews sheetViews = new SheetViews();
-            sheetViews.Append(new SheetView() { TabSelected = true, WorkbookViewId = (UInt32Value)0U });
-            worksheet.Append(new SheetDimension() { Reference = "A1" });
-            worksheet.Append(sheetViews);
-
             worksheet.Append(new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D });
             if (columnWidthArr.Count > 0)
                 worksheet.Append(columns);
@@ -985,6 +1024,8 @@ namespace OpenXMLImportDLL
             if (mergeArr.Count > 0)
                 worksheet.Append(mergeCells);
             worksheetPart.Worksheet = worksheet;
+          
+            worksheet.Append(pageSetup);
             worksheet.Save();
 
         }
@@ -1093,6 +1134,14 @@ namespace OpenXMLImportDLL
         }
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
+        public static int AddPageSetup(bool landscape, int fitToPageWide, int fitToPageTail, bool grid)
+        {
+            nPageSetup.Clear();
+            nPageSetup.Add(new NPageSetup(landscape, fitToPageTail, fitToPageWide, grid));
+            return 0;
+        }
+
+        [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddCellData(
             int rowIndex,
             int colIndex,
@@ -1106,11 +1155,10 @@ namespace OpenXMLImportDLL
             bool underline,
             int horizontalAlignment,
             int verticalAlignment,
-            bool treead,
-            bool grid)
+            bool treead)
         {
             int ffi = SetFontFormat(bold, size, fontName, italic, underline);
-            int cfi = SetCellFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, grid, ffi);
+            int cfi = SetCellFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, ffi);
             cellsData.Add(new CellData(rowIndex, colIndex, data, cfi));
 
 
@@ -1205,10 +1253,9 @@ namespace OpenXMLImportDLL
             int horizontalAlignment,
             int verticalAlignment,
             bool treead,
-            bool grid,
             int fontIndex)
         {
-            CellStyleFormat currentCell = new CellStyleFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, grid, fontIndex);
+            CellStyleFormat currentCell = new CellStyleFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, fontIndex);
 
             int counter = 1;
             foreach (CellStyleFormat d in cellStyleFormatList)
@@ -1244,6 +1291,7 @@ namespace OpenXMLImportDLL
             mergeArr.Clear();
             fontStyleFormatList.Clear();
             cellStyleFormatList.Clear();
+            nPageSetup.Clear();
             return 0;
         }
 
@@ -1338,6 +1386,45 @@ namespace OpenXMLImportDLL
 
     }
 }
+
+public class NPageSetup
+{
+    bool landscapeOrientation;
+    int fitToPagesWide;
+    int fitToPagesTail;
+    bool grid;
+    public NPageSetup(bool landscapeOrientation, int fitToPagesWide, int fitToPagesTail, bool grid)
+    {
+        this.landscapeOrientation = landscapeOrientation;
+        this.fitToPagesWide = fitToPagesWide;
+        this.fitToPagesTail = fitToPagesTail;
+        this.grid = grid;
+
+    }
+    public bool LandscapeOrientation
+    {
+        get { return landscapeOrientation; }
+        set { landscapeOrientation = value; }
+    }
+    public int FitToPagesWide
+    {
+        get { return fitToPagesWide; }
+        set { fitToPagesWide = value; }
+    }
+
+    public int FitToPagesTail
+    {
+        get { return fitToPagesTail; }
+        set { fitToPagesTail = value; }
+    }
+
+    public bool Grid
+    {
+        get { return grid; }
+        set { grid = value; }
+    }
+
+}
 public class CellData
 {
     int rowIndex;
@@ -1381,7 +1468,6 @@ class CellStyleFormat
     int horizontalAlignment;
     int verticalAlignment;
     bool treead;
-    bool grid;
     int fontIndex;
     public CellStyleFormat(
         bool wrapText,
@@ -1389,7 +1475,6 @@ class CellStyleFormat
         int horizontalAlignment,
         int verticalAlignment,
         bool treead,
-        bool grid,
         int fontIndex)
     {
         this.wrapText = wrapText;
@@ -1397,7 +1482,6 @@ class CellStyleFormat
         this.horizontalAlignment = horizontalAlignment;
         this.verticalAlignment = verticalAlignment;
         this.treead = treead;
-        this.grid = grid;
         this.fontIndex = fontIndex;
     }
 
@@ -1428,11 +1512,6 @@ class CellStyleFormat
         get { return treead; }
         set { treead = value; }
     }
-    public bool Grid
-    {
-        get { return grid; }
-        set { grid = value; }
-    }
     public int FontIndex
     {
         get { return fontIndex; }
@@ -1443,7 +1522,11 @@ class CellStyleFormat
         CellStyleFormat cfs = obj as CellStyleFormat;
         if (cfs == null)
             return false;
-        return this.WrapText == cfs.wrapText && this.LineStyle == cfs.lineStyle && this.HorizontalAlignment == cfs.horizontalAlignment && this.VerticalAlignment == cfs.verticalAlignment && this.Treead == cfs.treead && this.Grid == cfs.grid && this.fontIndex == cfs.fontIndex;
+        return this.WrapText == cfs.wrapText && this.LineStyle == cfs.lineStyle && this.HorizontalAlignment == cfs.horizontalAlignment && this.VerticalAlignment == cfs.verticalAlignment && this.Treead == cfs.treead && this.fontIndex == cfs.fontIndex;
+    }
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 }
 
@@ -1502,6 +1585,10 @@ class FontStyleFormat
         if (ffs == null)
             return false;
         return this.Bold == ffs.bold && this.Size == ffs.size && this.FontName.CompareTo(ffs.fontName) == 0 && this.Italic == ffs.italic && this.Underline == ffs.underline;
+    }
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 
 
