@@ -2,16 +2,10 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using A = DocumentFormat.OpenXml.Drawing;
-using Ap = DocumentFormat.OpenXml.ExtendedProperties;
-using Vt = DocumentFormat.OpenXml.VariantTypes;
-using X14 = DocumentFormat.OpenXml.Office2010.Excel;
-using excel = Microsoft.Office.Interop.Excel;
 
 
 
@@ -28,7 +22,12 @@ namespace OpenXMLImportDLL
         static private List<CellStyleFormat> cellStyleFormatList = new List<CellStyleFormat>();
         static private List<FontStyleFormat> fontStyleFormatList = new List<FontStyleFormat>();
 
-        //Convert Excel column number to Excel column name (1=A, 2=B)
+
+        /// <summary>
+        /// Convert Excel column number to Excel column name.
+        /// </summary>
+        /// <param name="columnNumber"></param>
+        /// <returns>"Column name. (A,B,AF)"</returns>
         private static string GetExcelColumnName(int columnNumber)
         {
             int dividend = columnNumber;
@@ -43,9 +42,16 @@ namespace OpenXMLImportDLL
             return columnName;
         }
 
+
+
+        /// <summary>
+        /// Convert Excel column name to Excel column number.
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <returns>Column number. (1,2,56)</returns>
         private static int GetExcelColumnNumber(string columnName)
         {
-            string output = RegexReplace(columnName, 1);
+            string output = Regex.Replace(columnName, @"[\d-]", string.Empty);
             if (string.IsNullOrEmpty(output)) throw new ArgumentNullException("columnName");
             output = output.ToUpperInvariant();
             int sum = 0;
@@ -57,24 +63,12 @@ namespace OpenXMLImportDLL
             return sum;
         }
 
-        private static string RegexReplace(string input, int sw)
-        {
-            //sw=1 remove numbers from string //sw=2 remove char from string
-            if (sw == 1)
-            {
-                string output = Regex.Replace(input, @"[\d-]", string.Empty);
-                return output;
-            }
-            if (sw == 2)
-            {
-                string output = Regex.Replace(input, @"[A-Z]", string.Empty);
-                return output;
-            }
-            return "error";
-        }
-
         // Adds child parts and generates content of the specified part.
-
+        /// <summary>
+        /// Generate xslx file and after clear all arrays.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int GenerateExcel(string filePath)
         {
@@ -198,15 +192,11 @@ namespace OpenXMLImportDLL
                 ForceFullCalculation = true,
                 FullCalculationOnLoad = true
             };
-
-
-
             workbook.Append(fileVersion);
             workbook.Append(workbookProperties);
             workbook.Append(bookViews);
             workbook.Append(sheets);
             workbook.Append(calculationProperties);
-
             workbookPart.Workbook = workbook;
         }
 
@@ -214,8 +204,6 @@ namespace OpenXMLImportDLL
         private static void GenerateWorkbookStylesPartContent(WorkbookStylesPart workbookStylesPart)
         {
             Stylesheet stylesheet1 = new Stylesheet();
-
-
 
             Fills fills1 = new Fills();
 
@@ -234,8 +222,6 @@ namespace OpenXMLImportDLL
 
             NumberingFormats numberingFormats = new NumberingFormats();
             NumberingFormat numberingFormat = new NumberingFormat() { NumberFormatId = (UInt32Value)43U, FormatCode = "_-* #,##0.00\\ _₽_-;\\-* #,##0.00\\ _₽_-;_-* \"-\"??\\ _₽_-;_-@_-" };
-
-
 
             Borders borders = new Borders() { Count = (UInt32Value)6U };
 
@@ -275,9 +261,6 @@ namespace OpenXMLImportDLL
             borders.Append(botBorder);
             borders.Append(allBorder);
 
-
-
-
             Fonts fonts = new Fonts();
 
             Font defFont = new Font();
@@ -315,9 +298,6 @@ namespace OpenXMLImportDLL
                 fonts.Append(font);
             }
 
-
-
-
             CellStyleFormats cellStyleFormats1 = new CellStyleFormats();
             CellFormat cellFormat1 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U };
 
@@ -334,7 +314,6 @@ namespace OpenXMLImportDLL
                 {
                     treeadsw = 43;
                 }
-
 
                 CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)(UInt32)treeadsw, FontId = (UInt32Value)(UInt32)f.FontIndex, FillId = (UInt32Value)0U, BorderId = (UInt32Value)(UInt32)f.LineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true, ApplyNumberFormat = f.Treead };
                 cellFormats.Append(cellFormat);
@@ -361,14 +340,7 @@ namespace OpenXMLImportDLL
 
                 Alignment alignment = new Alignment() { Horizontal = hav, Vertical = vav, WrapText = f.WrapText };
                 cellFormat.Append(alignment);
-
-
-
-
-
             }
-
-
 
             CellStyles cellStyles1 = new CellStyles();
             CellStyle cellStyle1 = new CellStyle() { Name = "Normal", FormatId = (UInt32Value)0U, BuiltinId = (UInt32Value)0U };
@@ -387,11 +359,6 @@ namespace OpenXMLImportDLL
             stylesheet1.Append(tableStyles1);
 
             workbookStylesPart.Stylesheet = stylesheet1;
-
-
-
-
-
         }
 
         // Generates content of themePart1.
@@ -988,17 +955,11 @@ namespace OpenXMLImportDLL
                     showGreed = false;
                 worksheet.Append(sheetProperties);
             }
-   
-         
 
-          
             SheetViews sheetViews = new SheetViews();
             sheetViews.Append(new SheetView() { ShowGridLines = showGreed, TabSelected = true, WorkbookViewId = (UInt32Value)0U });
             worksheet.Append(new SheetDimension() { Reference = "A1" });
             worksheet.Append(sheetViews);
-
-
-
 
             foreach (CellData d in cellsData)
             {
@@ -1024,27 +985,21 @@ namespace OpenXMLImportDLL
             if (mergeArr.Count > 0)
                 worksheet.Append(mergeCells);
             worksheetPart.Worksheet = worksheet;
-          
             worksheet.Append(pageSetup);
             worksheet.Save();
-
         }
 
         private static void SetFormatedCellData(Cell cell, string data, int i, int j)
         {
-
             if (data == null || data.Length == 0)
                 return;
-
             int number;
             decimal dec;
             CellValue cellValue = new CellValue();
             CellFormula cellFormula = new CellFormula();
             if (data.Substring(0, 1) == "=")
             {
-
                 cell.DataType = new EnumValue<CellValues>(CellValues.String);
-
                 if (data.ToString().Contains('R') && data.ToString().Contains('C'))
                 {
                     string convertedFormula = TransformFormulaToA1Format(data, i, GetExcelColumnName(j));
@@ -1056,8 +1011,6 @@ namespace OpenXMLImportDLL
                     cellFormula.Text = data.Remove(0, 1);
                     cell.Append(cellFormula);
                 }
-
-
             }
             else if (Int32.TryParse(data, out number))
             {
@@ -1104,10 +1057,8 @@ namespace OpenXMLImportDLL
         }
         private static void InsertColumnWidth(Columns columns)
         {
-
             foreach (var d in columnWidthArr)
             {
-
                 Column column = new Column()
                 {
                     Min = (UInt32Value)(UInt32)d.Key,
@@ -1125,7 +1076,11 @@ namespace OpenXMLImportDLL
             rowHeightArr[rowIndex] = rowHeight;
             return 0;
         }
-
+        /// <summary>
+        /// Add merge cells. 
+        /// </summary>
+        /// <param name="mergedCellsId"></param>
+        /// <returns></returns>
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddMergeCell(string mergedCellsId)
         {
@@ -1160,11 +1115,6 @@ namespace OpenXMLImportDLL
             int ffi = SetFontFormat(bold, size, fontName, italic, underline);
             int cfi = SetCellFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, ffi);
             cellsData.Add(new CellData(rowIndex, colIndex, data, cfi));
-
-
-
-
-
             return 0;
         }
 
@@ -1246,7 +1196,6 @@ namespace OpenXMLImportDLL
             PageMargins pageMargins = new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D };
         }
 
-
         private static int SetCellFormat(
             bool wrapText,
             int lineStyle,
@@ -1295,10 +1244,8 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
-
         private static string TransformFormulaToA1Format(string formula, int row, string column)
         {
-
             String pattern = @"((R((\d*)|(\[[-+]?\d*\])))?C((\d+)|(\[[-+]?\d+\])))"
                                 + @"|(R((\d+)|(\[[-+]?\d+\]))(C((\d*)|(\[[-+]?\d*\])))?)";
             return Regex.Replace(formula, pattern, new MatchEvaluator(delegate(Match match) { return TransformReferenceToA1Format(match, row, column); }));
@@ -1309,12 +1256,10 @@ namespace OpenXMLImportDLL
         private static string TransformReferenceToA1Format(Match match, int row, string column)
         {
             string reference = match.Value;
-
             string rowRefPattern = @"R\[([-+]?\d*)\]";
             string rowAbsPattern = @"R(\d+)";
             string colRefPattern = @"C\[([-+]?\d*)\]";
             string colAbsPattern = @"C(\d+)";
-
 
             Boolean isRowRef = Regex.IsMatch(reference, rowRefPattern);
             Boolean isRowAbs = Regex.IsMatch(reference, rowAbsPattern);
@@ -1322,7 +1267,6 @@ namespace OpenXMLImportDLL
             Boolean isColAbs = Regex.IsMatch(reference, colAbsPattern);
             Boolean hasRow = Regex.IsMatch(reference, "R");
             Boolean hasCol = Regex.IsMatch(reference, "C");
-
 
             string currentRowPattern = null;
             string currentColPattern = null;
@@ -1461,7 +1405,7 @@ public class CellData
 }
 
 
-class CellStyleFormat
+public class CellStyleFormat
 {
     bool wrapText;
     int lineStyle;
@@ -1485,7 +1429,6 @@ class CellStyleFormat
         this.fontIndex = fontIndex;
     }
 
-
     public bool WrapText
     {
         get { return wrapText; }
@@ -1496,7 +1439,6 @@ class CellStyleFormat
         get { return lineStyle; }
         set { lineStyle = value; }
     }
-
     public int HorizontalAlignment
     {
         get { return horizontalAlignment; }
@@ -1530,8 +1472,7 @@ class CellStyleFormat
     }
 }
 
-
-class FontStyleFormat
+public class FontStyleFormat
 {
     bool bold;
     double size;
@@ -1550,7 +1491,6 @@ class FontStyleFormat
         this.fontName = fontName;
         this.italic = italic;
         this.underline = underline;
-
     }
 
     public bool Bold
@@ -1563,7 +1503,6 @@ class FontStyleFormat
         get { return size; }
         set { size = value; }
     }
-
     public string FontName
     {
         get { return fontName; }
@@ -1590,40 +1529,4 @@ class FontStyleFormat
     {
         return base.GetHashCode();
     }
-
-
 }
-
-
-// boolean ib_setvisible = true //При разрушении объекта сделать визуальным
-//boolean ib_setprint = false //При разрушении объекта отправить на печать
-//integer   ii_Orientation = 1 //Ориентация (1- книжная, 2- альбомная)
-//boolean ib_Zoom = false //
-//long il_startrow = 1 // Строка с которой начинается вывод таблицы
-//integer ii_setFitToPagesWide = 1 //Разместить не более чем на 1 странице в ширину
-//integer ii_setFitToPagesTall =  1 //Разместить не более чем на 1 страниц в высоту
-//integer ii_nozms = 0 //Обрезать не значащие нули вместе с разделителем
-
-
-////Параметры шрифта и ячейки, применяются для каждой выводимой ячейки
-//boolean ib_setBold = false //Жирный
-//integer ii_setsize = 12 //Размер шрифта
-//string is_setFontName = "Times New Roman" 
-//boolean ib_setItalic = False //Курсив
-//boolean ib_setUnderline = False //Подчеркнутый
-
-//boolean ib_setWrapText = False  //Переносить по словам
-//integer ii_setLineStyle = 0 //Границы
-// integer ii_setHorizontalAlignment = 1 //Выравнивание по горизонтали (3 - по центру)
-// integer ii_setVerticalAlignment = 2 //Выравнивание по вертикали (2- по центру)
-// boolean ib_treead = false //Разделять на триады числовые значения
-// boolean ib_topline  = false //Верхняя граница
-// boolean ib_grid  = false //Видимость сетки
-
-
-////---------
-//string is_fn = 'c:\temp\temp.xls'
-//boolean ib_openfile = true
-
-//// Стиль ссылки
-//// Application.ReferenceStyle = xlA1
