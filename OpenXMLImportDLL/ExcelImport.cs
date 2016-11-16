@@ -220,8 +220,8 @@ namespace OpenXMLImportDLL
             fills1.Append(fill1);
             fills1.Append(fill2);
 
-            NumberingFormats numberingFormats = new NumberingFormats();
-            NumberingFormat numberingFormat = new NumberingFormat() { NumberFormatId = (UInt32Value)43U, FormatCode = "_-* #,##0.00\\ _₽_-;\\-* #,##0.00\\ _₽_-;_-* \"-\"??\\ _₽_-;_-@_-" };
+            //NumberingFormats numberingFormats = new NumberingFormats();
+            //NumberingFormat numberingFormat = new NumberingFormat() { NumberFormatId = (UInt32Value)43U, FormatCode = "_-* #,##0.00\\ _₽_-;\\-* #,##0.00\\ _₽_-;_-* \"-\"??\\ _₽_-;_-@_-" };
 
             Borders borders = new Borders() { Count = (UInt32Value)6U };
 
@@ -312,10 +312,23 @@ namespace OpenXMLImportDLL
                 int treeadsw = 0;
                 if (f.Treead)
                 {
-                    treeadsw = 43;
+                    treeadsw = 4;
                 }
 
-                CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)(UInt32)treeadsw, FontId = (UInt32Value)(UInt32)f.FontIndex, FillId = (UInt32Value)0U, BorderId = (UInt32Value)(UInt32)f.LineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true, ApplyNumberFormat = f.Treead };
+
+                int lineStyle;
+                switch (f.LineStyle)
+                {
+                    default: lineStyle = 0; break;
+                    case 1: lineStyle = 1; break;
+                    case 2: lineStyle = 2; break;
+                    case 3: lineStyle = 3; break;
+                    case 4: lineStyle = 4; break;
+                    case 5: lineStyle = 5; break;
+                }
+
+
+                CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)(UInt32)treeadsw, FontId = (UInt32Value)(UInt32)f.FontIndex, FillId = (UInt32Value)0U, BorderId = (UInt32Value)(UInt32)lineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true, ApplyNumberFormat = f.Treead };
                 cellFormats.Append(cellFormat);
 
                 VerticalAlignmentValues vav;
@@ -969,6 +982,9 @@ namespace OpenXMLImportDLL
 
                 Row row = GetRow(sheetData, i);
                 Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
+
+                if (d.Data == null)
+                    d.Data = "";
                 SetFormatedCellData(cell, d.Data.ToString(), i, j);
                 InsertCellIntoRow(cell, row);
             }
