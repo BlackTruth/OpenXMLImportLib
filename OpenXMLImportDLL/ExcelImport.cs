@@ -489,6 +489,15 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
+        public static int GetColRow()
+        {
+            int i = 0;
+            foreach (CellData a in cellsData)
+            {
+                i++;
+            }
+            return i;
+        }
         private static Row GetRow(SheetData sheetData, int rowIndex)
         {
             Row newRow = null;
