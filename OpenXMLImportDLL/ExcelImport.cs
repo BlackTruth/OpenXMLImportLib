@@ -240,7 +240,6 @@ namespace OpenXMLImportDLL
                     treeadsw = 4;
                 }
 
-
                 int lineStyle;
                 switch (f.LineStyle)
                 {
@@ -251,7 +250,6 @@ namespace OpenXMLImportDLL
                     case 4: lineStyle = 4; break;
                     case 5: lineStyle = 5; break;
                 }
-
 
                 CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)(UInt32)treeadsw, FontId = (UInt32Value)(UInt32)f.FontIndex, FillId = (UInt32Value)0U, BorderId = (UInt32Value)(UInt32)lineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true, ApplyNumberFormat = f.Treead };
                 cellFormats.Append(cellFormat);
@@ -274,7 +272,6 @@ namespace OpenXMLImportDLL
                     case 2: vav = VerticalAlignmentValues.Center; break;
                     case 3: vav = VerticalAlignmentValues.Top; break;
                 }
-
 
                 Alignment alignment = new Alignment() { Horizontal = hav, Vertical = vav, WrapText = f.WrapText };
                 cellFormat.Append(alignment);
@@ -342,14 +339,12 @@ namespace OpenXMLImportDLL
                 {
                     previousRow = GetRow(sheetData, i);
                 }
-
-                Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
+                string excelColName = GetExcelColumnName(j);
+                Cell cell = new Cell() { CellReference = excelColName + i, StyleIndex = (UInt32Value)(UInt32)k };
                 if (d.Data == null)
                     d.Data = "";
-                SetFormatedCellData(cell, d.Data.ToString(), i, j);
+                SetFormatedCellData(cell, d.Data.ToString(), i, excelColName);
                 InsertCellIntoRow(cell, previousRow);
-
-
             }
 
             Columns columns = new Columns();
@@ -368,7 +363,7 @@ namespace OpenXMLImportDLL
             worksheet.Save();
         }
 
-        private static void SetFormatedCellData(Cell cell, string data, int i, int j)
+        private static void SetFormatedCellData(Cell cell, string data, int i, string excelColName)
         {
             if (data == null || data.Length == 0)
                 return;
@@ -381,7 +376,7 @@ namespace OpenXMLImportDLL
                 cell.DataType = new EnumValue<CellValues>(CellValues.String);
                 if (data.ToString().Contains('R') && data.ToString().Contains('C'))
                 {
-                    string convertedFormula = TransformFormulaToA1Format(data, i, GetExcelColumnName(j));
+                    string convertedFormula = TransformFormulaToA1Format(data, i, excelColName);
                     cellFormula.Text = convertedFormula.Remove(0, 1);
                     cell.Append(cellFormula);
                 }
@@ -544,25 +539,29 @@ namespace OpenXMLImportDLL
             }
             return row;
         }
+
         private static void InsertCellIntoRow(Cell cell, Row row)
         {
-            int cellColIndex = GetExcelColumnNumber(cell.CellReference.ToString());
             foreach (Cell current in row.Elements<Cell>())
             {
-                int comp = GetExcelColumnNumber(current.CellReference.ToString()) - cellColIndex;
-                if (comp >= 0)
+                int comp = string.Compare(current.CellReference,cell.CellReference);
+                if (comp>=0)
                 {
                     if (comp == 0)
                     {
                         row.InsertBefore<Cell>(cell, current);
                         current.Remove();
+
                         return;
                     }
                     row.InsertBefore<Cell>(cell, current);
+
                     return;
                 }
             }
             row.Append(cell);
+
+
             return;
         }
 
