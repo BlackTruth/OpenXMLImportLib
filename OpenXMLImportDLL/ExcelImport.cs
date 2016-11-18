@@ -79,7 +79,7 @@ namespace OpenXMLImportDLL
                 WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>("rId1");
                 WorkbookStylesPart workbookStylesPart = workbookPart.AddNewPart<WorkbookStylesPart>("rId3");
                 SharedStringTablePart sharedStringTablePart1 = workbookPart.AddNewPart<SharedStringTablePart>("rId4");
-             
+
                 Thread th1 = new Thread(GenerateWorksheetPartContent);
                 th1.Start(worksheetPart as object);
 
@@ -329,19 +329,27 @@ namespace OpenXMLImportDLL
             worksheet.Append(new SheetDimension() { Reference = "A1" });
             worksheet.Append(sheetViews);
 
+
+            Row previousRow = null;
+
             foreach (CellData d in cellsData)
             {
                 int i = (int)d.Row;
                 int j = (int)d.Column;
                 int k = (int)d.Styleindex;
 
-                Row row = GetRow(sheetData, i);
-                Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
+                if (previousRow == null || previousRow.RowIndex != i)
+                {
+                    previousRow = GetRow(sheetData, i);
+                }
 
+                Cell cell = new Cell() { CellReference = GetExcelColumnName(j) + i, StyleIndex = (UInt32Value)(UInt32)k };
                 if (d.Data == null)
                     d.Data = "";
                 SetFormatedCellData(cell, d.Data.ToString(), i, j);
-                InsertCellIntoRow(cell, row);
+                InsertCellIntoRow(cell, previousRow);
+
+
             }
 
             Columns columns = new Columns();
@@ -447,6 +455,7 @@ namespace OpenXMLImportDLL
             rowHeightArr[rowIndex] = rowHeight;
             return 0;
         }
+
         /// <summary>
         /// Add merge cells. 
         /// </summary>
@@ -489,15 +498,7 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
-        public static int GetColRow()
-        {
-            int i = 0;
-            foreach (CellData a in cellsData)
-            {
-                i++;
-            }
-            return i;
-        }
+
         private static Row GetRow(SheetData sheetData, int rowIndex)
         {
             Row newRow = null;
