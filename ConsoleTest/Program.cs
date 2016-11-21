@@ -55,7 +55,7 @@ namespace ConsoleApplication1
         static void AddExcel(string path)
         {
             for (int i = 1; i <= 1000; i++)
-                for (int j = 1; j <= 100; j++)
+                for (int j = 1; j <= 1000; j++)
                 {
                     OpenXMLImportDLL.ExcelImport.AddCellData(i, j, i + "|" + j, false, 10, false, 5, "Viner Hand ITC", false, true, 1, 1, false);
                 }
