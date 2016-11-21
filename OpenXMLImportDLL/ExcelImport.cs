@@ -8,9 +8,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-
-
-
 namespace OpenXMLImportDLL
 {
     public class ExcelImport
@@ -344,10 +341,10 @@ namespace OpenXMLImportDLL
                 begin += part;
                 thrNum++;
             }
-
-
+            
             Columns columns = new Columns();
             InsertColumnWidth(columns);
+
             MergeCells mergeCells = new MergeCells();
             SetMergeCell(mergeCells);
 
@@ -376,7 +373,6 @@ namespace OpenXMLImportDLL
             List<CellData> newList = cellsData.GetRange(begin, part);
             foreach (CellData currentCellData in newList)
             {
-
                 int i = (int)currentCellData.Row;
                 int j = (int)currentCellData.Column;
                 int k = (int)currentCellData.Styleindex;
@@ -398,8 +394,6 @@ namespace OpenXMLImportDLL
         {
             lock (cell)
             {
-
-
                 if (data == null || data.Length == 0)
                     return;
                 int number;
@@ -556,6 +550,7 @@ namespace OpenXMLImportDLL
         {
             double? rowHeight;
             Row row = null;
+
             if (rowHeightArr.TryGetValue(i, out rowHeight))
             {
                 row = new Row()
@@ -585,8 +580,8 @@ namespace OpenXMLImportDLL
             {
                 foreach (Cell current in row.Elements<Cell>())
                 {
-
                     int comp = current.CellReference.ToString().Length - cell.CellReference.ToString().Length;
+
                     if (comp == 0)
                         comp = current.CellReference.ToString().CompareTo(cell.CellReference.ToString());
 
@@ -596,21 +591,15 @@ namespace OpenXMLImportDLL
                         {
                             row.InsertBefore<Cell>(cell, current);
                             current.Remove();
-
                             return;
                         }
                         row.InsertBefore<Cell>(cell, current);
-
                         return;
                     }
                 }
                 row.Append(cell);
-
-
                 return;
             }
-
-
         }
 
         private static void SetMergeCell(MergeCells mergeCells)
@@ -635,6 +624,7 @@ namespace OpenXMLImportDLL
             CellStyleFormat currentCell = new CellStyleFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, fontIndex);
 
             int counter = 1;
+
             foreach (CellStyleFormat d in cellStyleFormatList)
             {
                 if (currentCell.Equals(d))
@@ -758,7 +748,6 @@ namespace OpenXMLImportDLL
 
     }
 }
-
 public class NPageSetup
 {
     bool landscapeOrientation;
@@ -831,8 +820,6 @@ public class CellData
         set { styleIndex = value; }
     }
 }
-
-
 public class CellStyleFormat
 {
     bool wrapText;
@@ -899,7 +886,6 @@ public class CellStyleFormat
         return base.GetHashCode();
     }
 }
-
 public class FontStyleFormat
 {
     bool bold;

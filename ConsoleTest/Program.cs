@@ -59,7 +59,7 @@ namespace ConsoleApplication1
                 Random rnd = new Random();
 
 
-                for (int i = 1; i <= 100; i++)
+                for (int i = 1; i <= 1000; i++)
                     for (int j = 1; j <= 100; j++)
                     {
                         int row = rnd.Next(1, 1000);
