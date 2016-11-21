@@ -542,10 +542,15 @@ namespace OpenXMLImportDLL
 
         private static void InsertCellIntoRow(Cell cell, Row row)
         {
+
             foreach (Cell current in row.Elements<Cell>())
             {
-                int comp = string.Compare(current.CellReference,cell.CellReference);
-                if (comp>=0)
+
+                int comp = current.CellReference.ToString().Length - cell.CellReference.ToString().Length;
+                if (comp == 0)
+                    comp = current.CellReference.ToString().CompareTo(cell.CellReference.ToString());
+
+                if (comp >= 0)
                 {
                     if (comp == 0)
                     {
