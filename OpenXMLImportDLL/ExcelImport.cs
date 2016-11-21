@@ -326,31 +326,33 @@ namespace OpenXMLImportDLL
             worksheet.Append(new SheetDimension() { Reference = "A1" });
             worksheet.Append(sheetViews);
 
+            int prCount = Environment.ProcessorCount;
+            Thread[] threads = new Thread[prCount - 1];
 
-            Row previousRow = null;
-
-            foreach (CellData d in cellsData)
+            int part = cellsData.Count / prCount;
+            int begin = 0, thrNum = 0;
+            for (int i = 0; i < prCount; i++)
             {
-                int i = (int)d.Row;
-                int j = (int)d.Column;
-                int k = (int)d.Styleindex;
-
-                if (previousRow == null || previousRow.RowIndex != i)
+                if (i == prCount - 1)
                 {
-                    previousRow = GetRow(sheetData, i);
+                    part = cellsData.Count - begin;
+                    WriteCellInTable(new Object[] { (Object)begin, (Object)part, (Object)sheetData }); //В текущем потоке
+                    break;
                 }
-                string excelColName = GetExcelColumnName(j);
-                Cell cell = new Cell() { CellReference = excelColName + i, StyleIndex = (UInt32Value)(UInt32)k };
-                if (d.Data == null)
-                    d.Data = "";
-                SetFormatedCellData(cell, d.Data.ToString(), i, excelColName);
-                InsertCellIntoRow(cell, previousRow);
+                threads[thrNum] = new Thread(WriteCellInTable);
+                threads[thrNum].Start(new Object[] { (Object)begin, (Object)part, (Object)sheetData }); //Новый поток
+                begin += part;
+                thrNum++;
             }
+
 
             Columns columns = new Columns();
             InsertColumnWidth(columns);
             MergeCells mergeCells = new MergeCells();
             SetMergeCell(mergeCells);
+
+            for (int i = 0; i < thrNum; i++)
+                threads[i].Join();
 
             worksheet.Append(new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D });
             if (columnWidthArr.Count > 0)
@@ -363,48 +365,82 @@ namespace OpenXMLImportDLL
             worksheet.Save();
         }
 
+
+        private static void WriteCellInTable(Object obj)
+        {
+            Object[] param = (Object[])obj;
+            int begin = (int)param[0];
+            int part = (int)param[1];
+            SheetData sheetData = (SheetData)param[2];
+            Row previousRow = null;
+            List<CellData> newList = cellsData.GetRange(begin, part);
+            foreach (CellData currentCellData in newList)
+            {
+
+                int i = (int)currentCellData.Row;
+                int j = (int)currentCellData.Column;
+                int k = (int)currentCellData.Styleindex;
+
+                if (previousRow == null || previousRow.RowIndex != i)
+                {
+                    previousRow = GetRow(sheetData, i);
+                }
+                string excelColName = GetExcelColumnName(j);
+                Cell cell = new Cell() { CellReference = excelColName + i, StyleIndex = (UInt32Value)(UInt32)k };
+                if (currentCellData.Data == null)
+                    currentCellData.Data = "";
+                SetFormatedCellData(cell, currentCellData.Data.ToString(), i, excelColName);
+                InsertCellIntoRow(cell, previousRow);
+            }
+        }
+
         private static void SetFormatedCellData(Cell cell, string data, int i, string excelColName)
         {
-            if (data == null || data.Length == 0)
-                return;
-            int number;
-            decimal dec;
-            CellValue cellValue = new CellValue();
-            CellFormula cellFormula = new CellFormula();
-            if (data.Substring(0, 1) == "=")
+            lock (cell)
             {
-                cell.DataType = new EnumValue<CellValues>(CellValues.String);
-                if (data.ToString().Contains('R') && data.ToString().Contains('C'))
+
+
+                if (data == null || data.Length == 0)
+                    return;
+                int number;
+                decimal dec;
+                CellValue cellValue = new CellValue();
+                CellFormula cellFormula = new CellFormula();
+                if (data.Substring(0, 1) == "=")
                 {
-                    string convertedFormula = TransformFormulaToA1Format(data, i, excelColName);
-                    cellFormula.Text = convertedFormula.Remove(0, 1);
-                    cell.Append(cellFormula);
+                    cell.DataType = new EnumValue<CellValues>(CellValues.String);
+                    if (data.ToString().Contains('R') && data.ToString().Contains('C'))
+                    {
+                        string convertedFormula = TransformFormulaToA1Format(data, i, excelColName);
+                        cellFormula.Text = convertedFormula.Remove(0, 1);
+                        cell.Append(cellFormula);
+                    }
+                    else
+                    {
+                        cellFormula.Text = data.Remove(0, 1);
+                        cell.Append(cellFormula);
+                    }
+                }
+                else if (Int32.TryParse(data, out number))
+                {
+                    cell.DataType = new EnumValue<CellValues>(CellValues.Number);
+                    cellValue.Text = number.ToString();
+                    cell.Append(cellValue);
+                }
+                else if (Decimal.TryParse(data, NumberStyles.Number, CultureInfo.InstalledUICulture, out dec))
+                {
+                    string NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
+                    string correctString = data.Replace(NumberDecimalSeparator, ".");
+                    cell.DataType = new EnumValue<CellValues>(CellValues.Number);
+                    cellValue.Text = correctString;
+                    cell.Append(cellValue);
                 }
                 else
                 {
-                    cellFormula.Text = data.Remove(0, 1);
-                    cell.Append(cellFormula);
+                    cell.DataType = new EnumValue<CellValues>(CellValues.String);
+                    cellValue.Text = data.ToString();
+                    cell.Append(cellValue);
                 }
-            }
-            else if (Int32.TryParse(data, out number))
-            {
-                cell.DataType = new EnumValue<CellValues>(CellValues.Number);
-                cellValue.Text = number.ToString();
-                cell.Append(cellValue);
-            }
-            else if (Decimal.TryParse(data, NumberStyles.Number, CultureInfo.InstalledUICulture, out dec))
-            {
-                string NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator;
-                string correctString = data.Replace(NumberDecimalSeparator, ".");
-                cell.DataType = new EnumValue<CellValues>(CellValues.Number);
-                cellValue.Text = correctString;
-                cell.Append(cellValue);
-            }
-            else
-            {
-                cell.DataType = new EnumValue<CellValues>(CellValues.String);
-                cellValue.Text = data.ToString();
-                cell.Append(cellValue);
             }
         }
 
@@ -496,21 +532,24 @@ namespace OpenXMLImportDLL
 
         private static Row GetRow(SheetData sheetData, int rowIndex)
         {
-            Row newRow = null;
-            foreach (Row current in sheetData.Elements<Row>())
+            lock (sheetData)
             {
-                if (current.RowIndex >= rowIndex)
+                Row newRow = null;
+                foreach (Row current in sheetData.Elements<Row>())
                 {
-                    if (current.RowIndex == rowIndex)
-                        return current;
-                    newRow = GetNewRow(rowIndex);
-                    sheetData.InsertBefore<Row>(newRow, current);
-                    return newRow;
+                    if (current.RowIndex >= rowIndex)
+                    {
+                        if (current.RowIndex == rowIndex)
+                            return current;
+                        newRow = GetNewRow(rowIndex);
+                        sheetData.InsertBefore<Row>(newRow, current);
+                        return newRow;
+                    }
                 }
+                newRow = GetNewRow(rowIndex);
+                sheetData.Append(newRow);
+                return newRow;
             }
-            newRow = GetNewRow(rowIndex);
-            sheetData.Append(newRow);
-            return newRow;
         }
 
         private static Row GetNewRow(int i)
@@ -542,32 +581,36 @@ namespace OpenXMLImportDLL
 
         private static void InsertCellIntoRow(Cell cell, Row row)
         {
-
-            foreach (Cell current in row.Elements<Cell>())
+            lock (row)
             {
-
-                int comp = current.CellReference.ToString().Length - cell.CellReference.ToString().Length;
-                if (comp == 0)
-                    comp = current.CellReference.ToString().CompareTo(cell.CellReference.ToString());
-
-                if (comp >= 0)
+                foreach (Cell current in row.Elements<Cell>())
                 {
+
+                    int comp = current.CellReference.ToString().Length - cell.CellReference.ToString().Length;
                     if (comp == 0)
+                        comp = current.CellReference.ToString().CompareTo(cell.CellReference.ToString());
+
+                    if (comp >= 0)
                     {
+                        if (comp == 0)
+                        {
+                            row.InsertBefore<Cell>(cell, current);
+                            current.Remove();
+
+                            return;
+                        }
                         row.InsertBefore<Cell>(cell, current);
-                        current.Remove();
 
                         return;
                     }
-                    row.InsertBefore<Cell>(cell, current);
-
-                    return;
                 }
+                row.Append(cell);
+
+
+                return;
             }
-            row.Append(cell);
 
 
-            return;
         }
 
         private static void SetMergeCell(MergeCells mergeCells)
