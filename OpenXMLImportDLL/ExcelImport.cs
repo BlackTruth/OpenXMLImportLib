@@ -341,7 +341,7 @@ namespace OpenXMLImportDLL
                 begin += part;
                 thrNum++;
             }
-            
+
             Columns columns = new Columns();
             InsertColumnWidth(columns);
 
@@ -352,6 +352,7 @@ namespace OpenXMLImportDLL
                 threads[i].Join();
 
             worksheet.Append(new SheetFormatProperties() { DefaultRowHeight = 15D, DyDescent = 0.25D });
+            
             if (columnWidthArr.Count > 0)
                 worksheet.Append(columns);
             worksheet.Append(sheetData);
