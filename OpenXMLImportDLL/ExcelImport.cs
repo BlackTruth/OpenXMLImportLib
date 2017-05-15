@@ -402,6 +402,10 @@ namespace OpenXMLImportDLL
             }
             else
             {
+                if (data.Substring(0, 2) == "/T")
+                {
+                    data = data.Substring(2);
+                }
                 cell.DataType = new EnumValue<CellValues>(CellValues.String);
                 cellValue.Text = data.ToString();
                 cell.Append(cellValue);
