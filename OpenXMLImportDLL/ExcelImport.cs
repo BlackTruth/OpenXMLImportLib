@@ -42,7 +42,6 @@ namespace OpenXMLImportDLL
         }
 
 
-
         /// <summary>
         /// Convert Excel column name to Excel column number.
         /// </summary>
@@ -61,6 +60,7 @@ namespace OpenXMLImportDLL
             }
             return sum;
         }
+
 
         // Adds child parts and generates content of the specified part.
         /// <summary>
@@ -93,6 +93,7 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
+
         private static void GenerateWorkbookPartContent(WorkbookPart workbookPart)
         {
             Workbook workbook = new Workbook() { MCAttributes = new MarkupCompatibilityAttributes() { Ignorable = "x15" } };
@@ -104,12 +105,10 @@ namespace OpenXMLImportDLL
 
             BookViews bookViews = new BookViews();
             WorkbookView workbookView = new WorkbookView() { XWindow = 240, YWindow = 105, WindowWidth = (UInt32Value)14805U, WindowHeight = (UInt32Value)8010U };
-
             bookViews.Append(workbookView);
 
             Sheets sheets = new Sheets();
             Sheet sheet = new Sheet() { Name = "Лист1", SheetId = (UInt32Value)1U, Id = "rId1" };
-
             sheets.Append(sheet);
 
             CalculationProperties calculationProperties = new CalculationProperties()
@@ -118,6 +117,7 @@ namespace OpenXMLImportDLL
                 ForceFullCalculation = true,
                 FullCalculationOnLoad = true
             };
+
             workbook.Append(fileVersion);
             workbook.Append(workbookProperties);
             workbook.Append(bookViews);
@@ -133,27 +133,18 @@ namespace OpenXMLImportDLL
             Stylesheet stylesheet1 = new Stylesheet();
 
             Fills fills1 = new Fills() { Count = (UInt32Value)3U };
-
             Fill fill1 = new Fill();
             PatternFill patternFill1 = new PatternFill() { PatternType = PatternValues.None };
-
             fill1.Append(patternFill1);
-
             Fill fill2 = new Fill();
             PatternFill patternFill2 = new PatternFill() { PatternType = PatternValues.Gray125 };
-
             fill2.Append(patternFill2);
-
             fills1.Append(fill1);
             fills1.Append(fill2);
 
-
-
             Borders borders = new Borders() { Count = (UInt32Value)6U };
-
             Border noBorder = new Border(); //id 0
             borders.Append(noBorder);
-
             Border leftBorder = new Border(); //id 1
             Border rightBorder = new Border(); //id 2
             Border topBorder = new Border(); //id 3
@@ -162,25 +153,21 @@ namespace OpenXMLImportDLL
 
             LeftBorder leftBorder1 = new LeftBorder() { Style = BorderStyleValues.Thin };
             leftBorder.Append(leftBorder1);
-
             RightBorder rightBorder1 = new RightBorder() { Style = BorderStyleValues.Thin };
             rightBorder.Append(rightBorder1);
-
             TopBorder topBorder1 = new TopBorder() { Style = BorderStyleValues.Thin };
             topBorder.Append(topBorder1);
-
             BottomBorder bottomBorder1 = new BottomBorder() { Style = BorderStyleValues.Thin };
             botBorder.Append(bottomBorder1);
-
             LeftBorder leftBorder2 = new LeftBorder() { Style = BorderStyleValues.Thin };
             RightBorder rightBorder2 = new RightBorder() { Style = BorderStyleValues.Thin };
             TopBorder topBorder2 = new TopBorder() { Style = BorderStyleValues.Thin };
             BottomBorder bottomBorder2 = new BottomBorder() { Style = BorderStyleValues.Thin };
+
             allBorder.Append(leftBorder2);
             allBorder.Append(rightBorder2);
             allBorder.Append(topBorder2);
             allBorder.Append(bottomBorder2);
-
             borders.Append(leftBorder);
             borders.Append(rightBorder);
             borders.Append(topBorder);
@@ -188,7 +175,6 @@ namespace OpenXMLImportDLL
             borders.Append(allBorder);
 
             Fonts fonts = new Fonts();
-
             Font defFont = new Font();
             FontSize dFontSize = new FontSize() { Val = 11D };
             FontName dFontName = new FontName() { Val = "Calibri" };
@@ -198,7 +184,6 @@ namespace OpenXMLImportDLL
 
             foreach (FontStyleFormat f in fontStyleFormatList)
             {
-
                 Font font = new Font();
                 if (f.Bold)
                 {
@@ -217,38 +202,30 @@ namespace OpenXMLImportDLL
                 }
                 FontSize fontSize = new FontSize() { Val = f.Size };
                 font.Append(fontSize);
-
                 FontName fontName = new FontName() { Val = f.FontName };
                 font.Append(fontName);
-
                 fonts.Append(font);
             }
 
             CellStyleFormats cellStyleFormats1 = new CellStyleFormats();
             CellFormat cellFormat1 = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U };
-
             cellStyleFormats1.Append(cellFormat1);
-
             CellFormats cellFormats = new CellFormats();
             CellFormat dCellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U };
             cellFormats.Append(dCellFormat);
+
             int rgbId = 1;
+
             foreach (CellStyleFormat f in cellStyleFormatList)
             {
                 rgbId++;
 
-
                 Fill fill3 = new Fill();
-
                 PatternFill patternFill3 = new PatternFill() { PatternType = PatternValues.Solid };
                 ForegroundColor foregroundColor1 = new ForegroundColor() { Rgb = "F" + f.RgbHtmlCode };
-
                 patternFill3.Append(foregroundColor1);
-
                 fill3.Append(patternFill3);
                 fills1.Append(fill3);
-
-
 
                 int treeadsw = 0;
                 if (f.Treead)
@@ -266,7 +243,6 @@ namespace OpenXMLImportDLL
                     case 4: lineStyle = 4; break;
                     case 5: lineStyle = 5; break;
                 }
-
 
                 CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)(UInt32)treeadsw, FontId = (UInt32Value)(UInt32)f.FontIndex, FillId = (UInt32Value)(UInt32)rgbId, BorderId = (UInt32Value)(UInt32)lineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true, ApplyNumberFormat = f.Treead, ApplyFill = true };
                 cellFormats.Append(cellFormat);
@@ -291,8 +267,6 @@ namespace OpenXMLImportDLL
                 }
 
                 Alignment alignment = new Alignment() { Horizontal = hav, Vertical = vav, WrapText = f.WrapText };
-
-
                 cellFormat.Append(alignment);
             }
 
@@ -300,6 +274,7 @@ namespace OpenXMLImportDLL
             CellStyle cellStyle1 = new CellStyle() { Name = "Normal", FormatId = (UInt32Value)0U, BuiltinId = (UInt32Value)0U };
 
             cellStyles1.Append(cellStyle1);
+
             DifferentialFormats differentialFormats1 = new DifferentialFormats();
             TableStyles tableStyles1 = new TableStyles() { Count = (UInt32Value)0U, DefaultTableStyle = "TableStyleMedium2", DefaultPivotStyle = "PivotStyleMedium9" };
 
@@ -311,7 +286,6 @@ namespace OpenXMLImportDLL
             stylesheet1.Append(cellStyles1);
             stylesheet1.Append(differentialFormats1);
             stylesheet1.Append(tableStyles1);
-
             workbookStylesPart.Stylesheet = stylesheet1;
         }
 
@@ -325,7 +299,9 @@ namespace OpenXMLImportDLL
             SheetData sheetData = new SheetData();
             PageSetup pageSetup = new PageSetup();
             OrientationValues orientation = OrientationValues.Default;
+
             bool showGreed = true;
+
             if (nPageSetup.Count > 0)
             {
                 SheetProperties sheetProperties = new SheetProperties();
@@ -344,8 +320,6 @@ namespace OpenXMLImportDLL
             sheetViews.Append(new SheetView() { ShowGridLines = showGreed, TabSelected = true, WorkbookViewId = (UInt32Value)0U });
             worksheet.Append(new SheetDimension() { Reference = "A1" });
             worksheet.Append(sheetViews);
-
-
             Row previousRow = null;
 
             foreach (CellData d in cellsData)
@@ -431,6 +405,7 @@ namespace OpenXMLImportDLL
             }
         }
 
+
         // Generates content of sharedStringTablePart1.
         private static void GenerateSharedStringTablePart1Content(SharedStringTablePart sharedStringTablePart1)
         {
@@ -438,13 +413,15 @@ namespace OpenXMLImportDLL
             sharedStringTablePart1.SharedStringTable = sharedStringTable1;
         }
 
+
         private static void SetPackageProperties(OpenXmlPackage document)
         {
             document.PackageProperties.Description = "Created using OpenXML SDK and .NET 3.5";
-            document.PackageProperties.Version = "1.0.0.1";
+            document.PackageProperties.Version = "1.2";
             document.PackageProperties.Creator = "ORC";
             document.PackageProperties.Created = System.Xml.XmlConvert.ToDateTime(DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"), System.Xml.XmlDateTimeSerializationMode.RoundtripKind);
         }
+
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddColumnWidth(int columnIndex, double columnWidth)
@@ -452,6 +429,8 @@ namespace OpenXMLImportDLL
             columnWidthArr[columnIndex] = columnWidth;
             return 0;
         }
+
+
         private static void InsertColumnWidth(Columns columns)
         {
             foreach (var d in columnWidthArr)
@@ -467,12 +446,14 @@ namespace OpenXMLImportDLL
             }
         }
 
+
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddRowHeight(int rowIndex, double rowHeight)
         {
             rowHeightArr[rowIndex] = rowHeight;
             return 0;
         }
+
 
         /// <summary>
         /// Add merge cells. 
@@ -486,6 +467,7 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
+
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddPageSetup(bool landscape, int fitToPageWide, int fitToPageTail, bool grid)
         {
@@ -493,6 +475,7 @@ namespace OpenXMLImportDLL
             nPageSetup.Add(new NPageSetup(landscape, fitToPageTail, fitToPageWide, grid));
             return 0;
         }
+
 
         [System.Reflection.Obfuscation(Feature = "DllExport")]
         public static int AddCellData(
@@ -537,6 +520,7 @@ namespace OpenXMLImportDLL
             return newRow;
         }
 
+
         private static Row GetNewRow(int i)
         {
             double? rowHeight;
@@ -564,35 +548,31 @@ namespace OpenXMLImportDLL
             return row;
         }
 
+
         private static void InsertCellIntoRow(Cell cell, Row row)
         {
 
             foreach (Cell current in row.Elements<Cell>())
             {
-
                 int comp = current.CellReference.ToString().Length - cell.CellReference.ToString().Length;
                 if (comp == 0)
                     comp = current.CellReference.ToString().CompareTo(cell.CellReference.ToString());
-
                 if (comp >= 0)
                 {
                     if (comp == 0)
                     {
                         row.InsertBefore<Cell>(cell, current);
                         current.Remove();
-
                         return;
                     }
                     row.InsertBefore<Cell>(cell, current);
-
                     return;
                 }
             }
             row.Append(cell);
-
-
             return;
         }
+
 
         private static void SetMergeCell(MergeCells mergeCells)
         {
@@ -601,9 +581,9 @@ namespace OpenXMLImportDLL
                 MergeCell mergeCell = new MergeCell() { Reference = d };
                 mergeCells.Append(mergeCell);
             }
-
             PageMargins pageMargins = new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D };
         }
+
 
         private static int SetCellFormat(
             bool wrapText,
@@ -615,7 +595,6 @@ namespace OpenXMLImportDLL
             string rgbHtmlCode)
         {
             CellStyleFormat currentCell = new CellStyleFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, fontIndex, rgbHtmlCode);
-
             int counter = 1;
             foreach (CellStyleFormat d in cellStyleFormatList)
             {
@@ -625,12 +604,12 @@ namespace OpenXMLImportDLL
             }
             cellStyleFormatList.Add(currentCell);
             return cellStyleFormatList.Count;
-
         }
+
+
         private static int SetFontFormat(bool bold, int size, string fontName, bool italic, bool underline)
         {
             FontStyleFormat currentFont = new FontStyleFormat(bold, size, fontName, italic, underline);
-
             int fontCounter = 1;
             foreach (FontStyleFormat f in fontStyleFormatList)
             {
@@ -641,6 +620,7 @@ namespace OpenXMLImportDLL
             fontStyleFormatList.Add(currentFont);
             return fontStyleFormatList.Count;
         }
+
 
         private static long ClearArray()
         {
@@ -654,13 +634,13 @@ namespace OpenXMLImportDLL
             return 0;
         }
 
+
         private static string TransformFormulaToA1Format(string formula, int row, string column)
         {
             String pattern = @"((R((\d*)|(\[[-+]?\d*\])))?C((\d+)|(\[[-+]?\d+\])))"
                                 + @"|(R((\d+)|(\[[-+]?\d+\]))(C((\d*)|(\[[-+]?\d*\])))?)";
             return Regex.Replace(formula, pattern, new MatchEvaluator(delegate(Match match) { return TransformReferenceToA1Format(match, row, column); }));
         }
-
 
 
         private static string TransformReferenceToA1Format(Match match, int row, string column)
@@ -690,24 +670,20 @@ namespace OpenXMLImportDLL
             else
                 currentColPattern = colRefPattern;
 
-
             if (currentColPattern != null && hasCol)
             {
-
                 MatchCollection mc = Regex.Matches(reference, currentColPattern);
+
                 if (isColAbs)
                     column = GetExcelColumnName(Int32.Parse(mc[0].Groups[1].Value));
-
                 else
                     column = GetExcelColumnName(Int32.Parse(mc[0].Groups[1].Value) + GetExcelColumnNumber(column));
-
 
                 if (hasCol && !hasRow)
                     return column + ":" + column;
                 else
                     result = column;
             }
-
 
             if (hasRow && !(isRowAbs || isRowRef))
                 result += row;
@@ -721,25 +697,23 @@ namespace OpenXMLImportDLL
             if (currentRowPattern != null)
             {
                 MatchCollection mc = Regex.Matches(reference, currentRowPattern);
+
                 if (isRowAbs)
                     row = Int32.Parse(mc[0].Groups[1].Value);
                 else
-
                     row = (Int32.Parse(mc[0].Groups[1].Value) + row);
-
 
                 if (hasRow && !hasCol)
                     return row + ":" + row;
                 else
                     result += row;
             }
-
-
             return result;
         }
-
     }
 }
+
+
 
 public class NPageSetup
 {
@@ -779,6 +753,9 @@ public class NPageSetup
     }
 
 }
+
+
+
 public class CellData
 {
     int rowIndex;
@@ -813,6 +790,7 @@ public class CellData
         set { styleIndex = value; }
     }
 }
+
 
 
 public class CellStyleFormat
@@ -890,6 +868,8 @@ public class CellStyleFormat
         return base.GetHashCode();
     }
 }
+
+
 
 public class FontStyleFormat
 {
