@@ -9,8 +9,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 
 
-
-
 namespace OpenXMLImportDLL
 {
     public class ExcelImport
@@ -128,12 +126,13 @@ namespace OpenXMLImportDLL
             workbookPart.Workbook = workbook;
         }
 
+
         // Generates content of workbookStylesPart1.
         private static void GenerateWorkbookStylesPartContent(WorkbookStylesPart workbookStylesPart)
         {
             Stylesheet stylesheet1 = new Stylesheet();
 
-            Fills fills1 = new Fills();
+            Fills fills1 = new Fills() { Count = (UInt32Value)3U };
 
             Fill fill1 = new Fill();
             PatternFill patternFill1 = new PatternFill() { PatternType = PatternValues.None };
@@ -147,6 +146,8 @@ namespace OpenXMLImportDLL
 
             fills1.Append(fill1);
             fills1.Append(fill2);
+
+
 
             Borders borders = new Borders() { Count = (UInt32Value)6U };
 
@@ -231,9 +232,24 @@ namespace OpenXMLImportDLL
             CellFormats cellFormats = new CellFormats();
             CellFormat dCellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)0U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, FormatId = (UInt32Value)0U };
             cellFormats.Append(dCellFormat);
-
+            int rgbId = 1;
             foreach (CellStyleFormat f in cellStyleFormatList)
             {
+                rgbId++;
+
+
+                Fill fill3 = new Fill();
+
+                PatternFill patternFill3 = new PatternFill() { PatternType = PatternValues.Solid };
+                ForegroundColor foregroundColor1 = new ForegroundColor() { Rgb = "F" + f.RgbHtmlCode };
+
+                patternFill3.Append(foregroundColor1);
+
+                fill3.Append(patternFill3);
+                fills1.Append(fill3);
+
+
+
                 int treeadsw = 0;
                 if (f.Treead)
                 {
@@ -251,7 +267,8 @@ namespace OpenXMLImportDLL
                     case 5: lineStyle = 5; break;
                 }
 
-                CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)(UInt32)treeadsw, FontId = (UInt32Value)(UInt32)f.FontIndex, FillId = (UInt32Value)0U, BorderId = (UInt32Value)(UInt32)lineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true, ApplyNumberFormat = f.Treead };
+
+                CellFormat cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)(UInt32)treeadsw, FontId = (UInt32Value)(UInt32)f.FontIndex, FillId = (UInt32Value)(UInt32)rgbId, BorderId = (UInt32Value)(UInt32)lineStyle, FormatId = (UInt32Value)0U, ApplyFont = true, ApplyBorder = true, ApplyNumberFormat = f.Treead, ApplyFill = true };
                 cellFormats.Append(cellFormat);
 
                 VerticalAlignmentValues vav;
@@ -274,6 +291,8 @@ namespace OpenXMLImportDLL
                 }
 
                 Alignment alignment = new Alignment() { Horizontal = hav, Vertical = vav, WrapText = f.WrapText };
+
+
                 cellFormat.Append(alignment);
             }
 
@@ -489,10 +508,11 @@ namespace OpenXMLImportDLL
             bool underline,
             int horizontalAlignment,
             int verticalAlignment,
-            bool treead)
+            bool treead,
+            string rgbHtmlCode)
         {
             int ffi = SetFontFormat(bold, size, fontName, italic, underline);
-            int cfi = SetCellFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, ffi);
+            int cfi = SetCellFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, ffi, rgbHtmlCode);
             cellsData.Add(new CellData(rowIndex, colIndex, data, cfi));
             return 0;
         }
@@ -591,9 +611,10 @@ namespace OpenXMLImportDLL
             int horizontalAlignment,
             int verticalAlignment,
             bool treead,
-            int fontIndex)
+            int fontIndex,
+            string rgbHtmlCode)
         {
-            CellStyleFormat currentCell = new CellStyleFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, fontIndex);
+            CellStyleFormat currentCell = new CellStyleFormat(wrapText, lineStyle, horizontalAlignment, verticalAlignment, treead, fontIndex, rgbHtmlCode);
 
             int counter = 1;
             foreach (CellStyleFormat d in cellStyleFormatList)
@@ -802,13 +823,15 @@ public class CellStyleFormat
     int verticalAlignment;
     bool treead;
     int fontIndex;
+    string rgbHtmlCode;
     public CellStyleFormat(
         bool wrapText,
         int lineStyle,
         int horizontalAlignment,
         int verticalAlignment,
         bool treead,
-        int fontIndex)
+        int fontIndex,
+        string rgbHtmlCode)
     {
         this.wrapText = wrapText;
         this.lineStyle = lineStyle;
@@ -816,6 +839,7 @@ public class CellStyleFormat
         this.verticalAlignment = verticalAlignment;
         this.treead = treead;
         this.fontIndex = fontIndex;
+        this.rgbHtmlCode = rgbHtmlCode;
     }
 
     public bool WrapText
@@ -848,12 +872,18 @@ public class CellStyleFormat
         get { return fontIndex; }
         set { fontIndex = value; }
     }
+
+    public string RgbHtmlCode
+    {
+        get { return rgbHtmlCode; }
+        set { rgbHtmlCode = value; }
+    }
     public override bool Equals(object obj)
     {
         CellStyleFormat cfs = obj as CellStyleFormat;
         if (cfs == null)
             return false;
-        return this.WrapText == cfs.wrapText && this.LineStyle == cfs.lineStyle && this.HorizontalAlignment == cfs.horizontalAlignment && this.VerticalAlignment == cfs.verticalAlignment && this.Treead == cfs.treead && this.fontIndex == cfs.fontIndex;
+        return this.WrapText == cfs.wrapText && this.LineStyle == cfs.lineStyle && this.HorizontalAlignment == cfs.horizontalAlignment && this.VerticalAlignment == cfs.verticalAlignment && this.Treead == cfs.treead && this.fontIndex == cfs.fontIndex && this.rgbHtmlCode == cfs.rgbHtmlCode;
     }
     public override int GetHashCode()
     {
