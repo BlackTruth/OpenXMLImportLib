@@ -45,6 +45,9 @@
     <Compile Include="ExcelImport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"D:\WorkingDir\Мусор\Create&amp;checkDLL\ExportDll\ExportDll" "$(TargetPath)"</PostBuildEvent>
